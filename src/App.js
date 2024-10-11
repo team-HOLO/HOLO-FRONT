@@ -7,13 +7,14 @@ import AdminPage from "./pages/admin/AdminPage";
 import CategoryManagementPage from "./pages/admin/CategoryManagementPage";
 import Footer from "./components/Footer";
 import About from "./pages/About";
-import AdminDashboard from "./pages/admin/AdminDashboard";  // Home 컴포넌트 import
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import Main from "./pages/Main";
 
 const theme = createTheme({
     palette: {
         primary: {
-            main: '#424242', // 무채색(회색) 계열 색상
-            contrastText: '#ffffff', // 텍스트 색상
+            main: '#424242',
+            contrastText: '#ffffff',
         },
     },
 });
@@ -22,19 +23,23 @@ function App() {
     return (
         <ThemeProvider theme={theme}>
             <Router>
-                <Header isAdmin={true}/>
-                <Routes>
-                    <Route path="/" element={<Home/>}/>
-                    <Route path="/admin" element={<AdminPage/>}>
-                        <Route index element={<AdminDashboard />} /> {/* 기본 경로에 대해 AdminDashboard 렌더링 */}
-                        <Route path="categories" element={<CategoryManagementPage/>}/>
-                        <Route path="members" element={<Home/>}/>
-                        <Route path="orders" element={<Home/>}/>
-                        <Route path="products" element={<Home/>}/>
-                    </Route>
-                    <Route path="/about" element={<About/>}/>
-                </Routes>
-                <Footer/>
+                <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+                    <Header isAdmin={true}/>
+                    <div style={{ flex: 1, paddingBottom: '60px' }}> {/* Footer 높이만큼 여백 추가 */}
+                        <Routes>
+                            <Route path="/" element={<Main/>}/>
+                            <Route path="/admin" element={<AdminPage/>}>
+                                <Route index element={<AdminDashboard />} />
+                                <Route path="categories" element={<CategoryManagementPage/>}/>
+                                <Route path="members" element={<Home/>}/>
+                                <Route path="orders" element={<Home/>}/>
+                                <Route path="products" element={<Home/>}/>
+                            </Route>
+                            <Route path="/about" element={<About/>}/>
+                        </Routes>
+                    </div>
+                    <Footer/>
+                </div>
             </Router>
         </ThemeProvider>
     );
