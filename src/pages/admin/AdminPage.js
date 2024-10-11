@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Box, List, ListItem, ListItemText, Divider, ListItemButton, Toolbar, Drawer } from '@mui/material';
+import { Box, List, ListItem, ListItemText, ListItemButton, Toolbar, Drawer } from '@mui/material';
 
 const AdminPage = () => {
     const location = useLocation();
