@@ -42,9 +42,9 @@ function CategoryMenu() {
                     key={category.categoryId}
                     onMouseEnter={(event) => handleMouseEnter(event, category.categoryId)}
                     style={{ margin: '20px', cursor: 'pointer' }}
-/*
-                    onMouseLeave={handleClose}
-*/
+                    /*
+                                        onMouseLeave={handleClose}
+                    */
                     onClick={(event) => handleMenuItemClick(event, category.categoryId)}
                 >
                     {category.name}
