@@ -9,6 +9,7 @@ import Footer from "./components/Footer";
 import About from "./pages/About";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Main from "./pages/Main";
+import ProductManagementPage from './pages/admin/ProductManagementPage'
 
 const theme = createTheme({
     palette: {
@@ -33,7 +34,7 @@ function App() {
                                 <Route path="categories" element={<CategoryManagementPage/>}/>
                                 <Route path="members" element={<Home/>}/>
                                 <Route path="orders" element={<Home/>}/>
-                                <Route path="products" element={<Home/>}/>
+                                <Route path="products" element={<ProductManagementPage/>}/>
                             </Route>
                             <Route path="/about" element={<About/>}/>
                         </Routes>
