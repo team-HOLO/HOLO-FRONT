@@ -12,6 +12,7 @@ import Main from "./pages/Main";
 import ProductManagementPage from './pages/admin/ProductManagementPage'
 import axios from "axios";
 import ProductList from './components/Product/ProductList';
+import Cart from './components/Cart/cart';
 
 const theme = createTheme({
     palette: {
@@ -52,6 +53,7 @@ function App() {
                                 <Route path="members" element={<Home/>}/>
                                 <Route path="orders" element={<Home/>}/>
                                 <Route path="products" element={<ProductManagementPage/>}/>
+                                <Route path="cart" element={<Cart />} />
                             </Route>
                             <Route path="/about" element={<About/>}/>
                         </Routes>
