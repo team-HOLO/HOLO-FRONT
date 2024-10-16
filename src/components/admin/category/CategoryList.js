@@ -1,10 +1,10 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import CategoryItem from './CategoryItem';
+import CategoryItem from "components/admin/category/CategoryItem";
 
 const CategoryList = ({ categories, onEdit, onDelete }) => {
 
-    
+
   return (
     <Table>
       <TableHead>

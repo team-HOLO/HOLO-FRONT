@@ -9,15 +9,15 @@ function Main() {
     const carouselList = [
         {
             title: "가구",
-            url: `${process.env.PUBLIC_URL}/images/main_image1.jpg`
+            url: 'images/main_image1.jpg'
         },
         {
             title: "주방",
-            url: `${process.env.PUBLIC_URL}/images/main_image2.jpg`
+            url: 'images/main_image2.jpg'
         },
         {
             title: "소품",
-            url: `${process.env.PUBLIC_URL}/images/main_image3.jpg`
+            url: 'images/main_image3.jpg'
         }
     ];
 
@@ -63,7 +63,7 @@ function Main() {
                                     <CardMedia
                                         component="img"
                                         height="300"
-                                        image={`${process.env.PUBLIC_URL}/images/main_image1.jpg`}
+                                        image={'images/main_image1.jpg'}
                                         alt="쇼파"
                                     />
                                     <CardContent>

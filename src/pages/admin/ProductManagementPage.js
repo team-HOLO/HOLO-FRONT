@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Container, TextField, TablePagination, Select, MenuItem, FormControl, InputLabel, Button, Box } from '@mui/material';
 import ProductItem from '../../components/Product/ProductIem';
 import ProductList from '../../components/Product/ProductList';
-import DeleteConfirmationDialog from '../../components/Category/DeleteConfirmationDialog';
+import DeleteConfirmationDialog from 'components/admin/category/DeleteConfirmationDialog';
 import ProductForm from '../../components/Product/ProductForm';
 
 const ProductManagementPage = () => {
