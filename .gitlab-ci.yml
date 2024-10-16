@@ -1,0 +1,10 @@
+stages:
+    - sync_to_bitbucket # 스테이지 이름
+
+sync:
+    stage: sync_to_bitbucket
+    script:
+        - git remote add bitbucket https://{BITBUCKET_USERNAME}:{BITBUCKET_APP_PASSWORD}@bitbucket.org/team1-holo/holo-fe.git
+        - git push bitbucket HEAD:refs/heads/main  # GitLab의 dev 브랜치를 Bitbucket의 main 브랜치로 푸시
+    only:
+        - dev  # GitLab의 dev 브랜치에서만 실행되도록 설정
