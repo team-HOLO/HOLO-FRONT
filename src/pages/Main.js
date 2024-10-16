@@ -101,10 +101,10 @@ function Main() {
                                     )}
                                     <CardContent>
                                         <Typography gutterBottom variant="h5" component="div">
-                                            {product.name}
+                                            쇼파
                                         </Typography>
                                         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                            {product.price} 원
+                                            1인용 쇼파
                                         </Typography>
                                     </CardContent>
                                 </CardActionArea>
