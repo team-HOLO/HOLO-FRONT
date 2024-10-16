@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 
 const ProductForm = ({open, product, onClose}) => {
-    const [newProduct, setProductt] = useState({
+    const [newProduct, setNewProduct] = useState({
         name: '',
         price: '',
         description: '',
@@ -13,11 +13,18 @@ const ProductForm = ({open, product, onClose}) => {
         files: [],
         thumbnails: [], // 썸네일로 선택된 이미지의 인덱스 배열
     });
+    const [error, setError] = useState('');
+    const [nameError, setNameError] = useState('');
+    const [priceError, setPriceError] = useState('');
+    const [descriptionError, setDescriptionError] = useState('');
+    const [stockQuantityError, setStockQuantityError] = useState('');
+    const [imageError, setImageError] = useState('');
+    const [thumbnailImageError, setThumbnailImageError] = useState('');
 
     useEffect(() => {
         // 제품이 존재하는 경우: 수정
         if (product) {
-            setProductt({
+            setNewProduct({
                 name: product.name,
                 price: product.price,
                 description: product.description,
@@ -27,11 +34,10 @@ const ProductForm = ({open, product, onClose}) => {
                 // files: product.files || [],
                 thumbnails: product.isThumbnails || [],
             });
-            console.log('dsafjlkadsjfkladsfj'+product.images);
         }
         // 제품이 존재하지 않는 경우: 새로 생성
         else {
-            setProductt({
+            setNewProduct({
                 name: '',
                 price: '',
                 description: '',
@@ -48,24 +54,30 @@ const ProductForm = ({open, product, onClose}) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setProductt((prevProduct) => ({
+        setNewProduct((prevProduct) => ({
             ...prevProduct,
             [name]: value,
         }));
+
+          // 에러 초기화
+          if (name === 'name') setNameError('');
+          if (name === 'price') setPriceError('');
+          if (name === 'description') setDescriptionError('');
+          if (name === 'stockQuantity') setStockQuantityError('');
     };
 
     const handleOptionChange = (index, e) => {
         const { name, value } = e.target;
         const newOptions = [...newProduct.productOptions];
         newOptions[index][name] = value;
-        setProductt((prevProduct) => ({
+        setNewProduct((prevProduct) => ({
             ...prevProduct,
             productOptions: newOptions,
         }));
     };
 
     const addOption = () => {
-        setProductt((prevProduct) => ({
+        setNewProduct((prevProduct) => ({
             ...prevProduct,
             productOptions: [...prevProduct.productOptions, { color: '', size: ''}],
         }));
@@ -82,35 +94,68 @@ const ProductForm = ({open, product, onClose}) => {
         });
     
         // 상태 업데이트
-        setProductt((prevProduct) => ({
+        setNewProduct((prevProduct) => ({
             ...prevProduct,
             images: imageUrls, // 미리보기용 URL
             files: files,
         }));
+
+        setImageError(''); // 에러 초기화
     };
 
     const toggleThumbnail = (index) => {
-        setProductt((prevProduct) => {
+        setNewProduct((prevProduct) => {
             const newThumbnails = [...prevProduct.thumbnails];
             if (newThumbnails.includes(index)) {
                 newThumbnails.splice(newThumbnails.indexOf(index), 1); // 선택 해제
             } else {
                 newThumbnails.push(index); // 선택
             }
+
+            const errorMessage = newThumbnails.length === 0 ? '최소 하나의 썸네일을 선택해야 합니다.' : '';
+            setThumbnailImageError(errorMessage);
+
             return {
                 ...prevProduct,
                 thumbnails: newThumbnails,
             };
+
+
         });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        let hasError = false;
+        if (!newProduct.name) {
+            setNameError('상품명은 필수입니다.');
+            hasError = true;
+        }
+        if (!newProduct.price) {
+            setPriceError('가격은 필수입니다.');
+            hasError = true;
+        }
+        if (!newProduct.description) {
+            setDescriptionError('상품 설명은 필수입니다.');
+            hasError = true;
+        }
+        if (!newProduct.stockQuantity) {
+            setStockQuantityError('재고 수량은 필수입니다.');
+            hasError = true;
+        }
+        if (newProduct.images.length === 0) {
+            setImageError('이미지 업로드는 필수입니다.');
+            hasError = true;
+        }
+        if( newProduct.thumbnails.length === 0) {
+            setThumbnailImageError('최소 하나의 썸네일을 선택해야합니다.');
+            hasError = true;
+        }
+
+        if (hasError) return; // 에러가 있으면 제출하지 않음
+
         const isThumbnailList = newProduct.images.map((_, index) => newProduct.thumbnails.includes(index));
-
-        console.log('isThumbnailList:' , isThumbnailList);
-
         const formData = new FormData();
         formData.append('addProductRequest', new Blob([JSON.stringify({
             name: newProduct.name,
@@ -124,46 +169,42 @@ const ProductForm = ({open, product, onClose}) => {
         newProduct.images.forEach((image, index) => {
         const file = newProduct.files[index]; 
         if (file) {
-            console.log('Appending image:', file); // 각 파일 확인
             formData.append('productImages', file); // 'productImages'는 서버에서 받을 필드 이름
         }});
 
         //상품 새로 생성
         if(!product) {
             try {
-                const response = await fetch('/api/products', {
-                    method: 'POST',
-                    body: formData,
-                });
-        
+
+                const response= await axios.post('http://localhost:8080/api/products', formData);
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('상품 등록 성공:', data);
                     alert('상품 등록 성공');
                 } else {
-                    console.error('상품 등록 실패:', response.statusText);
+                    setError('상품 등록 실패');
                 }
             } catch (error) {
                 console.error('서버 오류:', error);
+                return;
             }
         } else {  //카테고리 수정
             try {
-                const response = await fetch(`/api/products/${product.productId}`, {
-                    method: 'PUT',
-                    body: formData,
-                });
-        
+
+                const response= await axios.put('http://localhost:8080/api/products/${product.productId}', formData);
+
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('상품 수정 성공:', data);
                     alert('상품 수정 성공');
                 } else {
-                    console.error('상품 수정 실패:', response.statusText);
+                    setError('상품 수정 실패');
                 }
             } catch (error) {
+                // setError('필수 입력값입니다.');
                 console.error('서버 오류:', error);
+                return;
             }
         }
+
         onClose();
         window.location.reload(); 
     };
@@ -180,6 +221,8 @@ const ProductForm = ({open, product, onClose}) => {
                         value={newProduct.name}
                         onChange={handleChange}
                         margin="normal"
+                        error={!!nameError}
+                        helperText={nameError}
                         required
                     />
                     <TextField
@@ -190,6 +233,8 @@ const ProductForm = ({open, product, onClose}) => {
                         value={newProduct.price}
                         onChange={handleChange}
                         margin="normal"
+                        error={!!priceError}
+                        helperText={priceError}
                         required
                     />
                     <TextField 
@@ -201,6 +246,8 @@ const ProductForm = ({open, product, onClose}) => {
                         value={newProduct.description}
                         onChange={handleChange}
                         margin="normal"
+                        error={!!descriptionError}
+                        helperText={descriptionError}
                         required
                     />
                     <TextField 
@@ -211,6 +258,8 @@ const ProductForm = ({open, product, onClose}) => {
                         value={newProduct.stockQuantity}
                         onChange={handleChange}
                         margin="normal"
+                        error={!!stockQuantityError}
+                        helperText={stockQuantityError}
                         required
                     />
                     {newProduct.productOptions.map((option, index) => (
@@ -246,9 +295,13 @@ const ProductForm = ({open, product, onClose}) => {
                         multiple
                         accept="image/*"
                         onChange={handleImageChange}
+                        error={!!error} 
+                        helperText={error} 
                         required
                     />
+                      {imageError && <div style={{ color: 'red' }}>{imageError}</div>}
                     <h3>이미지 미리보기</h3>
+                    {thumbnailImageError && <div style={{ color: 'red' }}>{thumbnailImageError}</div>}
                     <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                         {newProduct.images.map((image, index) => (
                             <div key={index} style={{ margin: '10px' }}>
@@ -292,147 +345,6 @@ const ProductForm = ({open, product, onClose}) => {
             </DialogActions>
         </Dialog>
     );
-    
-
-    // return (
-    //     <form onSubmit={handleSubmit}>
-    //         <h2>상품 등록</h2>
-    //         <Box component="form" mt={2}>
-    //             <TextField
-    //                 // fullWidth
-    //                 label="상품명"
-    //                 name="name"
-    //                 value={product.name}
-    //                 onChange={handleChange}
-    //                 margin="normal"
-    //                 required
-    //             />
-    //             <br/>
-
-    //             <TextField
-    //                 // fullWidth
-    //                 label="가격"
-    //                 type="number"
-    //                 name="price"
-    //                 value={product.price}
-    //                 onChange={handleChange}
-    //                 margin="normal"
-    //                 required
-    //             />
-    //             <br/>
-
-    //             <TextField 
-    //                 label="상품 설명"
-    //                 name="description"
-    //                 multiline
-    //                 rows={4}
-    //                 value={product.description}
-    //                 onChange={handleChange}
-    //                 margin="normal"
-    //                 required
-    //             />
-    //             <br />
-
-    //             <TextField 
-    //                 label="재고 수량"
-    //                 type="number"
-    //                 name="stockQuantity"
-    //                 value={product.stockQuantity}
-    //                 onChange={handleChange}
-    //                 margin="normal"
-    //                 required
-    //             />
-    //             <br />
-
-    //             {product.productOptions.map((option, index) => (
-    //                 <div key={index}>
-    //                     <TextField 
-    //                         label="색상"
-    //                         type="text"
-    //                         name="color"
-    //                         size="small"
-    //                         value={option.color}
-    //                         onChange={(e) => handleOptionChange(index, e)}
-    //                         margin="normal"
-    //                         required
-    //                     />
-    //                     <TextField 
-    //                         label="사이즈"
-    //                         type="text"
-    //                         name="size"
-    //                         size="small"
-    //                         value={option.size}
-    //                         onChange={(e) => handleOptionChange(index, e)}
-    //                         margin="normal"
-    //                         required
-    //                     />
-    //                     <br />
-    //                     <Button variant="contained" onClick={addOption}>
-    //                         옵션 추가 
-    //                     </Button>
-    //                 </div>
-    //             ))}
-    //             <br />
-                
-    //             <h3>상품 이미지</h3>
-    //             <input 
-    //                 type="file"
-    //                 multiple
-    //                 accept="image/*"
-    //                 // name={`image`}
-    //                 onChange={handleImageChange}
-    //                 required
-    //             />
-    //             <br />
-
-    //             <h3>이미지 미리보기</h3>
-    //             <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-    //                 {product.images.map((image, index) => (
-    //                     <div key={index} style={{ margin: '10px' }}>
-    //                         <img
-    //                             src={image}
-    //                             alt={`상품 이미지 ${index + 1}`}
-    //                             style={{
-    //                                 width: '100px',
-    //                                 height: '100px',
-    //                                 cursor: 'pointer',
-    //                                 border: product.thumbnails.includes(index) ? '3px solid blue' : 'none',
-    //                             }}
-    //                             onClick={() => toggleThumbnail(index)}
-    //                         />
-    //                     </div>
-    //                 ))}
-    //             </div>
-    //             {product.thumbnails.length > 0 && (
-    //                 <div>
-    //                     <h4>선택된 썸네일:</h4>
-    //                     {product.thumbnails.map((thumbIndex) => (
-    //                         <img
-    //                             key={thumbIndex}
-    //                             src={product.images[thumbIndex]}
-    //                             alt={`선택된 썸네일 ${thumbIndex + 1}`}
-    //                             style={{ width: '150px', height: '150px', margin: '5px' }}
-    //                         />
-    //                     ))}
-    //                 </div>
-    //             )}
-    //             <Button variant="contained" onClick={handleSubmit}>
-    //                 상품 등록
-    //             </Button>
-    //             <Button variant="outlined">
-    //                 취소
-    //             </Button>
-    //         </Box>
-    //         <br/>
-    //         <br/>
-    //         <br/>
-    //         <br/>
-    //         <br/>
-    //         <br/>
-    //         <br/>
-        
-    //     </form>
-    // );
 };
 
 export default ProductForm;

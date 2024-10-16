@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, TextField, TablePagination, Select, MenuItem, FormControl, InputLabel, Button, Box } from '@mui/material';
 import ProductItem from '../../components/Product/ProductIem';
-import ProductList from '../../components/Product/ProductList';
+import ProductListAdmin from '../../components/Product/ProductListAdmin';
 import DeleteConfirmationDialog from 'components/admin/category/DeleteConfirmationDialog';
 import ProductForm from '../../components/Product/ProductForm';
 
@@ -20,7 +20,6 @@ const ProductManagementPage = () => {
   }, [page]);
 
   const fetchProducts = async () => {
-    // const [sortBy, direction] = sortOption.split('_');
     try {
       const response = await axios.get('/api/admin/products', {
         params: {
@@ -35,17 +34,9 @@ const ProductManagementPage = () => {
     }
   };
 
-  // const handleSearchChange = (event) => {
-  //   setSearchTerm(event.target.value);
-  // };
-
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
   };
-
-  // const handleSortOptionChange = (event) => {
-  //   setSortOption(event.target.value);
-  // };
 
   const handleFormSubmit = (newProduct) => {
     axios.post('/api/products', newProduct)
@@ -91,7 +82,7 @@ const ProductManagementPage = () => {
       </Box>
       <ProductForm open={formOpen} product={selectedProduct} onClose={() => setFormOpen(false)}  onSubmit={handleFormSubmit}/>
 
-      <ProductList products={products} onEdit={handleEdit} onDelete={handleDeleteClick} />
+      <ProductListAdmin products={products} onEdit={handleEdit} onDelete={handleDeleteClick} />
       <TablePagination
         component="div"
         count={totalElements}
