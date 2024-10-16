@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, TextField, TablePagination, Select, MenuItem, FormControl, InputLabel, Button, Box } from '@mui/material';
 import ProductItem from '../../components/Product/ProductIem';
-import DeleteConfirmationDialog from 'components/admin/category/DeleteConfirmationDialog';
 import ProductListAdmin from '../../components/Product/ProductListAdmin';
+import ProductList from '../../components/Product/ProductList';
+import DeleteConfirmationDialog from 'components/admin/category/DeleteConfirmationDialog';
 import ProductForm from '../../components/Product/ProductForm';
 
 const ProductManagementPage = () => {
@@ -20,7 +21,7 @@ const ProductManagementPage = () => {
   }, [page]);
 
   const fetchProducts = async () => {
-    try {
+      try {
       const response = await axios.get('/api/admin/products', {
         params: {
           page,
