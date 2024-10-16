@@ -1,11 +1,14 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { AppBar, Toolbar, Typography, Box } from '@mui/material';
-import { Link } from 'react-router-dom';  // React Router의 Link 컴포넌트 사용
-import CategoryMenu from './CategoryMenu';
+import { Link } from 'react-router-dom';
+import CategoryMenu from 'components/CategoryMenu';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import LoginIcon from '@mui/icons-material/Login';
 
-function Header({ isAdmin }) {
+function Header({ isAdmin, categories, refreshCategories }) {
+    useEffect(() => {
+        refreshCategories();
+    }, [refreshCategories]);  // categories가 변경되면 refreshCategories가 실행
 
     return (
         <AppBar position="sticky" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
@@ -16,7 +19,7 @@ function Header({ isAdmin }) {
                     </Link>
                 </Typography>
                 <Box style={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
-                    <CategoryMenu />
+                    <CategoryMenu categories={categories} refreshCategories={refreshCategories} />
                 </Box>
                 <Box style={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end' }}>
                     {isAdmin && (  // isAdmin이 true일 때만 렌더링

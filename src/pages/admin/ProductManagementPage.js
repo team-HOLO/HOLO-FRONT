@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, TextField, TablePagination, Select, MenuItem, FormControl, InputLabel, Button, Box } from '@mui/material';
 import ProductItem from '../../components/Product/ProductIem';
+import DeleteConfirmationDialog from 'components/admin/category/DeleteConfirmationDialog';
 import ProductListAdmin from '../../components/Product/ProductListAdmin';
-import DeleteConfirmationDialog from '../../components/Category/DeleteConfirmationDialog';
 import ProductForm from '../../components/Product/ProductForm';
 
 const ProductManagementPage = () => {

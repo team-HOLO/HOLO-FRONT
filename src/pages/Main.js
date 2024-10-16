@@ -16,15 +16,15 @@ function Main() {
     const carouselList = [
         {
             title: "가구",
-            url: `${process.env.PUBLIC_URL}/images/main_image1.jpg`
+            url: 'images/main_image1.jpg'
         },
         {
             title: "주방",
-            url: `${process.env.PUBLIC_URL}/images/main_image2.jpg`
+            url: 'images/main_image2.jpg'
         },
         {
             title: "소품",
-            url: `${process.env.PUBLIC_URL}/images/main_image3.jpg`
+            url: 'images/main_image3.jpg'
         }
     ];
 
@@ -101,10 +101,10 @@ function Main() {
                                     )}
                                     <CardContent>
                                         <Typography gutterBottom variant="h5" component="div">
-                                            {product.name}
+                                            쇼파
                                         </Typography>
                                         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                            {product.price} 원
+                                            1인용 쇼파
                                         </Typography>
                                     </CardContent>
                                 </CardActionArea>

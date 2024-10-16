@@ -4,6 +4,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/
 const DeleteConfirmationDialog = ({ open, categoryName, categoryId, onClose, onDelete }) => {
     const handleDelete = () => {
         onDelete(categoryId);
+        onClose();
     };
     return (
         <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
@@ -23,4 +24,4 @@ const DeleteConfirmationDialog = ({ open, categoryName, categoryId, onClose, onD
     );
 };
 
-export default DeleteConfirmationDialog
+export default DeleteConfirmationDialog;

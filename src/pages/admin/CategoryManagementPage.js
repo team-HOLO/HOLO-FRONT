@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, TextField, TablePagination, Select, MenuItem, FormControl, InputLabel, Button, Box } from '@mui/material';
-import CategoryList from '../../components/Category/CategoryList';
-import CategoryForm from '../../components/Category/CategoryForm';
-import DeleteConfirmationDialog from '../../components/Category/DeleteConfirmationDialog';
+import CategoryList from 'components/admin/category/CategoryList';
+import CategoryForm from 'components/admin/category/CategoryForm';
+import DeleteConfirmationDialog from 'components/admin/category/DeleteConfirmationDialog';
 
-const CategoryManagementPage = () => {
+const CategoryManagementPage = ({ refreshCategories }) => {
   const [categories, setCategories] = useState([]);
   const [page, setPage] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,6 +19,15 @@ const CategoryManagementPage = () => {
   useEffect(() => {
     fetchCategories();
   }, [page, sortOption, searchTerm]);
+
+  const sortOptions = [
+    { value: 'name_asc', label: '이름 (오름차순)' },
+    { value: 'name_desc', label: '이름 (내림차순)' },
+    { value: 'categoryId_asc', label: '분류코드 (오름차순)' },
+    { value: 'categoryId_desc', label: '분류코드 (내림차순)' },
+    { value: 'createdAt_asc', label: '생성일자 (오름차순)' },
+    { value: 'createdAt_desc', label: '생성일자 (내림차순)' },
+  ];
 
   const fetchCategories = async () => {
     const [sortBy, direction] = sortOption.split('_');
@@ -43,6 +52,17 @@ const CategoryManagementPage = () => {
     setSearchTerm(event.target.value);
   };
 
+  const handleAddCategory = () => {
+    setSelectedCategory(null); // 새로운 카테고리 추가 시 선택된 카테고리 초기화
+    setFormOpen(true); // 폼 열기
+  };
+
+  const handleFormClose = () => {
+    setSelectedCategory(null); // 폼이 닫힐 때 선택된 카테고리 초기화
+    refreshCategories(); // 헤더의 카테고리 목록을 새로고침
+    setFormOpen(false);
+  };
+
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
   };
@@ -51,13 +71,14 @@ const CategoryManagementPage = () => {
     setSortOption(event.target.value);
   };
 
-  const handleFormSubmit = (newCategory) => {
-    axios.post('/api/categories', newCategory)
-      .then(() => {
-        fetchCategories();
-        setFormOpen(false);
-      })
-      .catch(error => console.error('Error adding category:', error));
+  const handleFormSubmit = async (newCategory) => {
+    try {
+      await axios.post('/api/categories', newCategory);
+      await fetchCategories(); // 새 카테고리 목록을 먼저 가져옴
+      handleFormClose();
+    } catch (error) {
+      console.error('Error adding category:', error);
+    }
   };
 
   const handleEdit = async (category) => {
@@ -77,23 +98,25 @@ const CategoryManagementPage = () => {
 
   const handleDeleteConfirm = async (categoryId) => {
     try {
-        await axios.delete(`/api/categories/${categoryId}`);
-        setDeleteDialogOpen(false);
-        await fetchCategories();
+      await axios.delete(`/api/categories/${categoryId}`);
+      await fetchCategories();
+      refreshCategories();
+      handleFormClose();
     } catch (error) {
-        console.error('Error deleting category:', error);
+      console.error('Error deleting category:', error);
     }
-};
+  };
+
 
   return (
     <Container>
       <h1>카테고리 관리</h1>
       <Box display="flex" justifyContent="flex-end" mb={2}>
-        <Button variant="contained" color="primary" onClick={() => setFormOpen(true)}>
+        <Button variant="contained" color="primary" onClick={handleAddCategory}>
           카테고리 추가
         </Button>
       </Box>
-      <CategoryForm open={formOpen} category={selectedCategory} onClose={() => setFormOpen(false)} onSubmit={handleFormSubmit} />
+      <CategoryForm open={formOpen} category={selectedCategory} fetchCategories={fetchCategories} onClose={handleFormClose} onSubmit={handleFormSubmit} />
       <TextField
         label="검색"
         value={searchTerm}
@@ -104,12 +127,13 @@ const CategoryManagementPage = () => {
       <FormControl variant="outlined" style={{ minWidth: '200px', marginBottom: '20px' }}>
         <InputLabel>정렬</InputLabel>
         <Select value={sortOption} onChange={handleSortOptionChange} label="정렬">
-          <MenuItem value="name_asc">이름 (오름차순)</MenuItem>
-          <MenuItem value="name_desc">이름 (내림차순)</MenuItem>
-          <MenuItem value="categoryId_asc">분류코드 (오름차순)</MenuItem>
-          <MenuItem value="categoryId_desc">분류코드 (내림차순)</MenuItem>
-          <MenuItem value="createdAt_asc">생성일자 (오름차순)</MenuItem>
-          <MenuItem value="createdAt_desc">생성일자 (내림차순)</MenuItem>
+          {
+            sortOptions.map((option) => (
+                <MenuItem key={option.value} value = {option.value}>
+                  {option.label}
+                </MenuItem>
+            ))
+          }
         </Select>
       </FormControl>
       <CategoryList categories={categories} onEdit={handleEdit} onDelete={handleDeleteClick} />

@@ -10,6 +10,7 @@ import About from "./pages/About";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Main from "./pages/Main";
 import ProductManagementPage from './pages/admin/ProductManagementPage'
+import axios from "axios";
 import ProductList from './components/Product/ProductList';
 
 const theme = createTheme({
@@ -22,18 +23,32 @@ const theme = createTheme({
 });
 
 function App() {
+    const [categories, setCategories] = useState([]);
+
+    const fetchCategoriesHeader = useCallback(() => {
+        axios.get('/api/categories')
+            .then(response => {
+                setCategories(response.data);
+            })
+            .catch(error => console.error('Error fetching categories:', error));
+    }, []);
+
+    useEffect(() => {
+        fetchCategoriesHeader();
+    }, [fetchCategoriesHeader]);
+
     return (
         <ThemeProvider theme={theme}>
             <Router>
                 <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-                    <Header isAdmin={true}/>
+                    <Header isAdmin={true} categories={categories} refreshCategories={fetchCategoriesHeader} />
                     <div style={{ flex: 1, paddingBottom: '60px' }}> {/* Footer 높이만큼 여백 추가 */}
                         <Routes>
                             <Route path="/" element={<Main/>}/>
                                 <Route path="products" element={<ProductList/>}/>
                             <Route path="/admin" element={<AdminPage/>}>
                                 <Route index element={<AdminDashboard />} />
-                                <Route path="categories" element={<CategoryManagementPage/>}/>
+                                <Route path="categories" element={<CategoryManagementPage refreshCategories={fetchCategoriesHeader}/>}/>
                                 <Route path="members" element={<Home/>}/>
                                 <Route path="orders" element={<Home/>}/>
                                 <Route path="products" element={<ProductManagementPage/>}/>
