@@ -4,7 +4,7 @@ stages:
 sync:
     stage: sync_to_bitbucket
     script:
-        - git remote add bitbucket https://$BITBUCKET_USERNAME:$BITBUCKET_APP_PASSWORD@bitbucket.org/team1-holo/holo-fe.git
+        - git remote set-url bitbucket https://$BITBUCKET_USERNAME:$BITBUCKET_APP_PASSWORD@bitbucket.org/team1-holo/holo-fe.git
         - git push bitbucket HEAD:refs/heads/main  # GitLab의 dev 브랜치를 Bitbucket의 main 브랜치로 푸시
     tags:
         - sync
