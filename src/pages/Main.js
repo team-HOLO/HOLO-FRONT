@@ -89,6 +89,7 @@ function Main() {
                 <Grid container spacing={7}>
                     {products.map((product) => (
                         <Grid item xs={12} sm={6} md={4} lg={3} key={product.productId}>
+                            <Link to={`/products/${product.productId}`} style={{ textDecoration: 'none' }}></Link>
                             <Card sx={{ maxWidth: 345 }}>
                                 <CardActionArea>
                                     {product.thumbNailImage.length > 0 && (

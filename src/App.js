@@ -31,6 +31,7 @@ function App() {
                         <Routes>
                             <Route path="/" element={<Main/>}/>
                                 <Route path="products" element={<ProductList/>}/>
+                                <Route path="products/:productId" element={<ProductDetails/>}/>
                             <Route path="/admin" element={<AdminPage/>}>
                                 <Route index element={<AdminDashboard />} />
                                 <Route path="categories" element={<CategoryManagementPage/>}/>
