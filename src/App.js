@@ -10,6 +10,7 @@ import About from "./pages/About";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Main from "./pages/Main";
 import ProductManagementPage from './pages/admin/ProductManagementPage'
+import ProductList from './components/Product/ProductList';
 
 const theme = createTheme({
     palette: {
@@ -29,6 +30,7 @@ function App() {
                     <div style={{ flex: 1, paddingBottom: '60px' }}> {/* Footer 높이만큼 여백 추가 */}
                         <Routes>
                             <Route path="/" element={<Main/>}/>
+                                <Route path="products" element={<ProductList/>}/>
                             <Route path="/admin" element={<AdminPage/>}>
                                 <Route index element={<AdminDashboard />} />
                                 <Route path="categories" element={<CategoryManagementPage/>}/>
