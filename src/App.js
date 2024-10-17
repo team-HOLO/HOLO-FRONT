@@ -11,6 +11,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import Main from "./pages/Main";
 import ProductManagementPage from './pages/admin/ProductManagementPage'
 import ProductList from './components/Product/ProductList';
+import ProductDetails from './components/Product/ProductDetails';
 
 const theme = createTheme({
     palette: {

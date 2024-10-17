@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import Carousel from "react-material-ui-carousel";
-import { Typography, Box, Grid } from "@mui/material";
+import { Typography, Box, Grid, Pagination } from "@mui/material";
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
-import usePagination from '@mui/material';
+// import Pagination from '@mui/material';
 import axios from 'axios';
+import {Link} from 'react-router-dom';
+
 
 
 
@@ -45,7 +47,7 @@ function Main() {
 
     useEffect(() => {
         const loadProducts = async () => {
-            const data = await fetchProducts(page - 1, 9); // 페이지는 0부터 시작하므로 -1
+            const data = await fetchProducts(page - 1, 8); // 페이지는 0부터 시작하므로 -1
             setProducts(data.content);
             setTotalPages(data.totalPages);
         };
@@ -89,7 +91,7 @@ function Main() {
                 <Grid container spacing={7}>
                     {products.map((product) => (
                         <Grid item xs={12} sm={6} md={4} lg={3} key={product.productId}>
-                            <Link to={`/products/${product.productId}`} style={{ textDecoration: 'none' }}></Link>
+                            <Link to={`/products/${product.productId}`} style={{ textDecoration: 'none' }}>
                             <Card sx={{ maxWidth: 345 }}>
                                 <CardActionArea>
                                     {product.thumbNailImage.length > 0 && (
@@ -110,16 +112,18 @@ function Main() {
                                     </CardContent>
                                 </CardActionArea>
                             </Card>
+                            </Link>
                         </Grid>
                     ))}
                 </Grid>
-                <usePagination
+                <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '40px' }}>
+                <Pagination
                     count={totalPages}
                     page={page}
                     onChange={(event, value) => setPage(value)}
                     color="primary"
-                    style={{ marginTop: '20px' }}
                 />
+            </Box>
             </Box>
         </>
     );
