@@ -1,14 +1,14 @@
 import React from 'react';
 import {Box, Grid, Paper} from '@mui/material';
-import AdminMenu from "../../components/AdminMenu";
+import AdminMenu from "components/admin/AdminMenu";
 import {Link} from "react-router-dom";
 
 const AdminDashboard = () => {
     const menuItems = [
-        { image: `${process.env.PUBLIC_URL}/images/members.svg`, title: '회원관리', desc: '회원 조회, 수정, 삭제', link: 'members' },
-        { image: `${process.env.PUBLIC_URL}/images/orders.svg`, title: '주문 관리', desc: '주문 조회, 상태 변경, 취소', link: 'orders'},
-        { image: `${process.env.PUBLIC_URL}/images/products.svg`, title: '상품 관리', desc: '상품 조회, 추가, 수정, 삭제', link: 'products'},
-        { image: `${process.env.PUBLIC_URL}/images/category.svg`, title: '카테고리 관리', desc: '카테고리 조회, 추가, 수정, 삭제', link: 'categories'},
+        { image: 'images/members.svg', title: '회원관리', desc: '회원 조회, 수정, 삭제', link: 'members' },
+        { image: 'images/orders.svg', title: '주문 관리', desc: '주문 조회, 상태 변경, 취소', link: 'orders'},
+        { image: 'images/products.svg', title: '상품 관리', desc: '상품 조회, 추가, 수정, 삭제', link: 'products'},
+        { image: '/images/category.svg', title: '카테고리 관리', desc: '카테고리 조회, 추가, 수정, 삭제', link: 'categories'},
     ];
 
     return (

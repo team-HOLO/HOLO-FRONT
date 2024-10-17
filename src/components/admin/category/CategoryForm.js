@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 
 // 카테고리 생성, 수정 폼
-const CategoryForm = ({ open, category, onClose }) => {
+const CategoryForm = ({ open, category, onClose, fetchCategories }) => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [parentCategory, setParentCategory] = useState('');
@@ -11,19 +11,20 @@ const CategoryForm = ({ open, category, onClose }) => {
     const [error, setError] = useState('');
 
     useEffect(() => {
+        setError(null);
         // 카테고리가 존재하는 경우: 수정
         if (category) {
             setName(category.name);
             setDescription(category.description);
             setParentCategory(category.parentCategory ? category.parentCategory.categoryId : '');
-        }
-        // 카테고리가 존재하지 않는 경우: 새로 생성
-        else {
+        } else {
+            // 카테고리가 없는 경우: 초기화
             setName('');
             setDescription('');
-            setParentCategory('');
+            setParentCategory(null);
         }
-    }, [category]);
+
+    }, [category, open]);
 
     useEffect(() => {
         // 대분류 카테고리 가져오기
@@ -41,46 +42,39 @@ const CategoryForm = ({ open, category, onClose }) => {
 
     // 수정 또는 생성 버튼 눌렀을 때 동작
     const handleSubmit = async () => {
+        if (!name.trim()) {
+            setError('카테고리명은 필수 입력 항목입니다.');
+            return;  // 요청을 보내지 않음
+        }
+
         try {
             // CategoryCreateDto랑 동일
             const categoryData = { name, description, parentCategory };
-            // 카테고리가 있는 경우
-            if (category) {
-                try {
-                    // 카테고리 수정 api
-                    await axios.put(`http://localhost:8080/api/categories/${category.categoryId}`, categoryData);
-                } catch (error) {
-                    // 409 Conflict 에러 발생
-                    if(error.response.status === 409) {
-                        setError('이미 존재하는 카테고리명입니다.');
-                    } else {
-                        // 기타 에러 발생
-                        setError('카테고리 수정 중 오류가 발생했습니다.');
-                    }
-                    return; // 에러 발생 시 함수 종료
+            // 카테고리 여부에 따라 Url 설정
+            const url = category
+                ? `http://localhost:8080/api/categories/${category.categoryId}` // 수정 url
+                : 'http://localhost:8080/api/categories';  // 추가 url
 
-                }
-            } else {
-                try {
-                    // 카테고리 생성 api
-                    await axios.post('http://localhost:8080/api/categories', categoryData);
-                } catch (error) {
-                    if(error.response.status === 409) {
-                        setError('이미 존재하는 카테고리명입니다.');
-                    } else {
-                        setError('카테고리 추가 중 오류가 발생했습니다.');
-                    }
-                    return; // 에러 발생 시 함수 종료
-                }
-            }
+            // 메서드 결정
+            const method = category ? 'put' : 'post';
+
+            // API 요청
+            await axios[method](url, categoryData);
+            // 창을 닫고 카테고리 목록 새로고침하는 콜백 함수 호출
             onClose();
-            window.location.reload(); // 페이지 전체를 리로드 -> 업데이트 된 리스트 반영을 위해
+            fetchCategories();  // 카테고리 목록 새로고침
         } catch (error) {
-            console.error('Error saving category:', error);
+            // 409 Conflict 에러 처리
+            if (error.response && error.response.status === 409) {
+                setError('이미 존재하는 카테고리명입니다.');
+            } else {
+                // 기타 에러 처리
+                setError(category ? '카테고리 수정 중 오류가 발생했습니다.' : '카테고리 추가 중 오류가 발생했습니다.');
+            }
         }
     };
 
-    // 
+    //
     const handleParentIdChange = (event) => {
         const value = event.target.value;
         setParentCategory(value === '' ? null : value);
