@@ -26,17 +26,17 @@ const CategoryForm = ({ open, category, onClose, fetchCategories }) => {
 
     }, [category, open]);
 
+    const fetchTopCategories = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/categories');
+            setTopCategories(response.data);
+        } catch (error) {
+            console.error('Error fetching top categories:', error);
+        }
+    };
+
     useEffect(() => {
         // 대분류 카테고리 가져오기
-        const fetchTopCategories = async () => {
-            try {
-                const response = await axios.get('http://localhost:8080/api/categories');
-                setTopCategories(response.data);
-            } catch (error) {
-                console.error('Error fetching top categories:', error);
-            }
-        };
-
         fetchTopCategories();
     }, []);
 
@@ -63,6 +63,7 @@ const CategoryForm = ({ open, category, onClose, fetchCategories }) => {
             // 창을 닫고 카테고리 목록 새로고침하는 콜백 함수 호출
             onClose();
             fetchCategories();  // 카테고리 목록 새로고침
+            fetchTopCategories();
         } catch (error) {
             // 409 Conflict 에러 처리
             if (error.response && error.response.status === 409) {
