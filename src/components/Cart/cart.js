@@ -12,11 +12,11 @@ import {
   Paper,
 } from "@mui/material";
 import { Add, Remove, Delete } from "@mui/icons-material";
-
+//상품목록에서 장바구니 담기 추가하면 이 부분을 빼겠습니다//
 const productsData = [
-  { id: 1, name: "의자", price: 29000, image: "chair.jpg" },
-  { id: 2, name: "탁자", price: 49000, image: "table.jpg" },
-  { id: 3, name: "커튼", price: 30000, image: "curtain.jpg" },
+  { id: 1, name: "의자", price: 29000, image: "chair.jpg", quantity: 1 },
+  { id: 2, name: "탁자", price: 49000, image: "table.jpg", quantity: 1 },
+  { id: 3, name: "커튼", price: 30000, image: "curtain.jpg", quantity: 1 },
 ];
 
 const getProductById = (id) => {
@@ -35,6 +35,13 @@ const Cart = () => {
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
+
+  // 상품이 없는 경우 alert 표시
+  useEffect(() => {
+    if (cart.length === 0) {
+      alert("장바구니에 상품이 없습니다.");
+    }
   }, [cart]);
 
   const handleQuantityChange = (id, amount) => {
@@ -65,15 +72,6 @@ const Cart = () => {
       setCheckedItems(cart.map((item) => item.id));
     }
     setSelectAll(!selectAll);
-  };
-
-  const handleAddProduct = (product) => {
-    const existingProduct = cart.find((item) => item.id === product.id);
-    if (existingProduct) {
-      handleQuantityChange(product.id, 1);
-    } else {
-      setCart([...cart, { id: product.id, quantity: 1 }]);
-    }
   };
 
   const handleCheckboxChange = (id) => {

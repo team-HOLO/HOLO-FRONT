@@ -47,13 +47,14 @@ function App() {
                         <Routes>
                             <Route path="/" element={<Main/>}/>
                                 <Route path="products" element={<ProductList/>}/>
+                                <Route path="/cart" element={<Cart />} />
                             <Route path="/admin" element={<AdminPage/>}>
                                 <Route index element={<AdminDashboard />} />
                                 <Route path="categories" element={<CategoryManagementPage refreshCategories={fetchCategoriesHeader}/>}/>
                                 <Route path="members" element={<Home/>}/>
                                 <Route path="orders" element={<Home/>}/>
                                 <Route path="products" element={<ProductManagementPage/>}/>
-                                <Route path="cart" element={<Cart />} />
+
                             </Route>
                             <Route path="/about" element={<About/>}/>
                         </Routes>
