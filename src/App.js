@@ -12,6 +12,7 @@ import Main from "./pages/Main";
 import ProductManagementPage from './pages/admin/ProductManagementPage'
 import axios from "axios";
 import ProductList from './components/Product/ProductList';
+import ProductDetails from './components/Product/ProductDetails';
 
 const theme = createTheme({
     palette: {
@@ -46,6 +47,7 @@ function App() {
                         <Routes>
                             <Route path="/" element={<Main/>}/>
                                 <Route path="products" element={<ProductList/>}/>
+                                <Route path="products/:productId" element={<ProductDetails/>}/>
                             <Route path="/admin" element={<AdminPage/>}>
                                 <Route index element={<AdminDashboard />} />
                                 <Route path="categories" element={<CategoryManagementPage refreshCategories={fetchCategoriesHeader}/>}/>
