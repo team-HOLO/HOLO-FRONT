@@ -13,6 +13,7 @@ import ProductManagementPage from "./pages/admin/ProductManagementPage";
 import axios from "axios";
 import ProductList from "./components/Product/ProductList";
 import SignInPage from "./pages/SignInPage";
+import SignUpPage from "./pages/SignUpPage";
 const theme = createTheme({
   palette: {
     primary: {
@@ -75,6 +76,7 @@ function App() {
               </Route>
               <Route path="/about" element={<About />} />
               <Route path="/signin" element={<SignInPage />} />
+              <Route path="/signup" element={<SignUpPage />} />
             </Routes>
           </div>
           <Footer />
