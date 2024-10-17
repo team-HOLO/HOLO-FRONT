@@ -54,7 +54,12 @@ function Header({ isAdmin, categories, refreshCategories }) {
           style={{ flexGrow: 1, display: "flex", justifyContent: "flex-end" }}
         >
           <AddShoppingCartIcon style={{ fontSize: "24px", margin: "0 10px" }} />
-          <LoginIcon style={{ fontSize: "24px", margin: "0 10px" }} />
+          <Link
+            to="/signin"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            <LoginIcon style={{ fontSize: "24px", margin: "0 10px" }} />
+          </Link>
         </Box>
       </Toolbar>
     </AppBar>
