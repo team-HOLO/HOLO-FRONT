@@ -2,12 +2,17 @@ import * as React from "react";
 import PropTypes from "prop-types";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
-import { inputsCustomizations } from "./customizations/inputs";
-import { dataDisplayCustomizations } from "./customizations/dataDisplay";
-import { feedbackCustomizations } from "./customizations/feedback";
-import { navigationCustomizations } from "./customizations/navigation";
-import { surfacesCustomizations } from "./customizations/surfaces";
-import { colorSchemes, typography, shadows, shape } from "./themePrimitives";
+import { inputsCustomizations } from "../../shared-theme/customizations/inputs";
+import { dataDisplayCustomizations } from "../../shared-theme/customizations/dataDisplay";
+import { feedbackCustomizations } from "../../shared-theme/customizations/feedback";
+import { navigationCustomizations } from "../../shared-theme/customizations/navigation";
+import { surfacesCustomizations } from "../../shared-theme/customizations/surfaces";
+import {
+  colorSchemes,
+  typography,
+  shadows,
+  shape,
+} from "../../shared-theme/themePrimitives";
 
 function AppTheme({ children, disableCustomTheme, themeComponents }) {
   const theme = React.useMemo(() => {

@@ -15,8 +15,8 @@ import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
 import ForgotPassword from "./ForgotPassword";
 import { GoogleIcon, SitemarkIcon } from "./CustomIcons";
-import AppTheme from "../shared-theme/AppTheme";
-import ColorModeSelect from "../shared-theme/ColorModeSelect";
+import AppTheme from "../theme/AppTheme";
+import ColorModeSelect from "../theme/ColorModeSelect";
 import { useNavigate } from "react-router-dom"; // useNavigate 훅 추가
 
 const Card = styled(MuiCard)(({ theme }) => ({
