@@ -14,9 +14,10 @@ import Stack from "@mui/material/Stack";
 import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
 import ForgotPassword from "./ForgotPassword";
-import { GoogleIcon, FacebookIcon, SitemarkIcon } from "./CustomIcons";
+import { GoogleIcon, SitemarkIcon } from "./CustomIcons";
 import AppTheme from "../shared-theme/AppTheme";
 import ColorModeSelect from "../shared-theme/ColorModeSelect";
+import { useNavigate } from "react-router-dom"; // useNavigate 훅 추가
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -60,6 +61,7 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignIn(props) {
+  const navigate = useNavigate(); // useNavigate 훅 호출
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
   const [passwordError, setPasswordError] = React.useState(false);
@@ -102,10 +104,15 @@ export default function SignIn(props) {
           .find((row) => row.startsWith("jwtToken="))
           ?.split("=")[1];
         console.log("JWT Token: ", token);
+        alert("로그인 성공");
+
+        navigate("/"); // 회원가입 성공 시 /signin 페이지로 리다이렉트
 
         // Redirect user or handle the logged-in state
       } else {
         console.error("Login failed");
+        alert("등록된 회원이 아닙니다!");
+        navigate("/"); // 회원가입 성공 시 /signin 페이지로 리다이렉트
       }
     } catch (error) {
       console.error("An error occurred while logging in: ", error);
@@ -246,14 +253,6 @@ export default function SignIn(props) {
               startIcon={<GoogleIcon />}
             >
               Sign in with Google
-            </Button>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => alert("Sign in with Facebook")}
-              startIcon={<FacebookIcon />}
-            >
-              Sign in with Facebook
             </Button>
           </Box>
         </Card>
