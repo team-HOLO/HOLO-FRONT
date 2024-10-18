@@ -50,20 +50,31 @@ const CategoryForm = ({ open, category, onClose, fetchCategories }) => {
         try {
             // CategoryCreateDto랑 동일
             const categoryData = { name, description, parentCategory };
+
             // 카테고리 여부에 따라 Url 설정
             const url = category
-                ? `http://localhost:8080/api/categories/${category.categoryId}` // 수정 url
-                : 'http://localhost:8080/api/categories';  // 추가 url
+                ? `http://localhost:8080/api/admin/categories/${category.categoryId}` // 수정 url
+                : 'http://localhost:8080/api/admin/categories';  // 추가 url
 
             // 메서드 결정
             const method = category ? 'put' : 'post';
 
             // API 요청
-            await axios[method](url, categoryData);
+            await axios({
+                method: method,
+                url: url,
+                data: categoryData,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                withCredentials: true  // 쿠키에 저장된 JWT를 자동으로 전송
+            });
+
             // 창을 닫고 카테고리 목록 새로고침하는 콜백 함수 호출
             onClose();
             fetchCategories();  // 카테고리 목록 새로고침
             fetchTopCategories();
+
         } catch (error) {
             // 409 Conflict 에러 처리
             if (error.response && error.response.status === 409) {
