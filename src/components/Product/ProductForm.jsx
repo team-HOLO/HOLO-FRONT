@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 
-const ProductForm = ({open, product, onClose}) => {
+const ProductForm = ({ open, product, onClose }) => {
     const [newProduct, setNewProduct] = useState({
         name: '',
         price: '',
@@ -12,6 +12,7 @@ const ProductForm = ({open, product, onClose}) => {
         images: [],
         files: [],
         thumbnails: [], // 썸네일로 선택된 이미지의 인덱스 배열
+        categoryId: '',
     });
     const [error, setError] = useState('');
     const [nameError, setNameError] = useState('');
@@ -21,7 +22,21 @@ const ProductForm = ({open, product, onClose}) => {
     const [imageError, setImageError] = useState('');
     const [thumbnailImageError, setThumbnailImageError] = useState('');
 
+    const [subCategories, setSubCategories] = useState([]);
+    const [selectedSubCategory, setSelectedSubCategory] = useState('');
+
     useEffect(() => {
+
+        axios.get('/api/categories/all')
+            .then(response => {
+                // 모든 하위 카테고리를 추출하여 상태로 저장
+                const allSubCategories = response.data.flatMap(category => category.subCategories);
+                setSubCategories(allSubCategories);
+            })
+            .catch(error => {
+                console.error('fail to get category', error);
+            });
+
         // 제품이 존재하는 경우: 수정
         if (product) {
             setNewProduct({
@@ -46,10 +61,22 @@ const ProductForm = ({open, product, onClose}) => {
                 images: [],
                 files: [],
                 thumbnails: [],
+                categoryId: '',
             });
         }
     }, [product]);
 
+    // 하위 카테고리 변경 핸들러
+    const handleSubCategoryChange = (event) => {
+        const selectedCategoryId = event.target.value;
+        setSelectedSubCategory(selectedCategoryId);
+        handleChange({
+            target: {
+                name: 'categoryId',
+                value: selectedCategoryId
+            }
+        });
+    }
 
 
     const handleChange = (e) => {
@@ -59,11 +86,11 @@ const ProductForm = ({open, product, onClose}) => {
             [name]: value,
         }));
 
-          // 에러 초기화
-          if (name === 'name') setNameError('');
-          if (name === 'price') setPriceError('');
-          if (name === 'description') setDescriptionError('');
-          if (name === 'stockQuantity') setStockQuantityError('');
+        // 에러 초기화
+        if (name === 'name') setNameError('');
+        if (name === 'price') setPriceError('');
+        if (name === 'description') setDescriptionError('');
+        if (name === 'stockQuantity') setStockQuantityError('');
     };
 
     const handleOptionChange = (index, e) => {
@@ -79,20 +106,20 @@ const ProductForm = ({open, product, onClose}) => {
     const addOption = () => {
         setNewProduct((prevProduct) => ({
             ...prevProduct,
-            productOptions: [...prevProduct.productOptions, { color: '', size: ''}],
+            productOptions: [...prevProduct.productOptions, { color: '', size: '' }],
         }));
     };
 
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
         const imageUrls = files.map(file => URL.createObjectURL(file));  // 이미지 미리보기를 위해 생성
-    
+
         // 실제 파일을 FormData에 추가
         const formData = new FormData();
         files.forEach(file => {
             formData.append('productImages', file); // 'productImages'는 서버에서 받을 필드 이름
         });
-    
+
         // 상태 업데이트
         setNewProduct((prevProduct) => ({
             ...prevProduct,
@@ -148,7 +175,7 @@ const ProductForm = ({open, product, onClose}) => {
             setImageError('이미지 업로드는 필수입니다.');
             hasError = true;
         }
-        if( newProduct.thumbnails.length === 0) {
+        if (newProduct.thumbnails.length === 0) {
             setThumbnailImageError('최소 하나의 썸네일을 선택해야합니다.');
             hasError = true;
         }
@@ -164,19 +191,21 @@ const ProductForm = ({open, product, onClose}) => {
             stockQuantity: parseInt(newProduct.stockQuantity, 10),
             productOptions: newProduct.productOptions,
             isThumbnails: isThumbnailList,
+            categoryId: newProduct.categoryId, // 선택된 카테고리 ID 추가
         })], { type: 'application/json' }));
 
         newProduct.images.forEach((image, index) => {
-        const file = newProduct.files[index]; 
-        if (file) {
-            formData.append('productImages', file); // 'productImages'는 서버에서 받을 필드 이름
-        }});
+            const file = newProduct.files[index];
+            if (file) {
+                formData.append('productImages', file); // 'productImages'는 서버에서 받을 필드 이름
+            }
+        });
 
         //상품 새로 생성
-        if(!product) {
+        if (!product) {
             try {
 
-                const response= await axios.post('http://localhost:8080/api/products', formData);
+                const response = await axios.post('http://localhost:8080/api/products', formData);
                 if (response.ok) {
                     const data = await response.json();
                     alert('상품 등록 성공');
@@ -190,7 +219,7 @@ const ProductForm = ({open, product, onClose}) => {
         } else {  //카테고리 수정
             try {
 
-                const response= await axios.put('http://localhost:8080/api/products/${product.productId}', formData);
+                const response = await axios.put('http://localhost:8080/api/products/${product.productId}', formData);
 
                 if (response.ok) {
                     const data = await response.json();
@@ -206,7 +235,7 @@ const ProductForm = ({open, product, onClose}) => {
         }
 
         onClose();
-        window.location.reload(); 
+        window.location.reload();
     };
 
     return (
@@ -237,7 +266,7 @@ const ProductForm = ({open, product, onClose}) => {
                         helperText={priceError}
                         required
                     />
-                    <TextField 
+                    <TextField
                         fullWidth
                         label="상품 설명"
                         name="description"
@@ -250,7 +279,7 @@ const ProductForm = ({open, product, onClose}) => {
                         helperText={descriptionError}
                         required
                     />
-                    <TextField 
+                    <TextField
                         fullWidth
                         label="재고 수량"
                         type="number"
@@ -262,9 +291,28 @@ const ProductForm = ({open, product, onClose}) => {
                         helperText={stockQuantityError}
                         required
                     />
+
+                    {/* 하위 카테고리 선택 */}
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel id="sub-category-label">카테고리</InputLabel>
+                        <Select
+                            labelId="sub-category-label"
+                            value={selectedSubCategory} // 선택된 카테고리 ID
+                            onChange={handleSubCategoryChange}
+                            name="subCategory"
+                            required
+                        >
+                            {subCategories.map((subCategory) => (
+                                <MenuItem key={subCategory.categoryId} value={subCategory.categoryId}> {/* categoryId를 value로 설정 */}
+                                    {subCategory.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
                     {newProduct.productOptions.map((option, index) => (
                         <div key={index}>
-                            <TextField 
+                            <TextField
                                 label="색상"
                                 type="text"
                                 name="color"
@@ -274,7 +322,7 @@ const ProductForm = ({open, product, onClose}) => {
                                 margin="normal"
                                 required
                             />
-                            <TextField 
+                            <TextField
                                 label="사이즈"
                                 type="text"
                                 name="size"
@@ -285,21 +333,21 @@ const ProductForm = ({open, product, onClose}) => {
                                 required
                             />
                             <Button variant="contained" onClick={addOption}>
-                                옵션 추가 
+                                옵션 추가
                             </Button>
                         </div>
                     ))}
                     <h3>상품 이미지</h3>
-                    <input 
+                    <input
                         type="file"
                         multiple
                         accept="image/*"
                         onChange={handleImageChange}
-                        error={!!error} 
-                        helperText={error} 
+                        error={!!error}
+                        helperText={error}
                         required
                     />
-                      {imageError && <div style={{ color: 'red' }}>{imageError}</div>}
+                    {imageError && <div style={{ color: 'red' }}>{imageError}</div>}
                     <h3>이미지 미리보기</h3>
                     {thumbnailImageError && <div style={{ color: 'red' }}>{thumbnailImageError}</div>}
                     <div style={{ display: 'flex', flexWrap: 'wrap' }}>
