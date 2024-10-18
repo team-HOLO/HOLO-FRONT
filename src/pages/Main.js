@@ -7,7 +7,7 @@ import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
 // import Pagination from '@mui/material';
 import axios from 'axios';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 
 
@@ -92,38 +92,36 @@ function Main() {
                     {products.map((product) => (
                         <Grid item xs={12} sm={6} md={4} lg={3} key={product.productId}>
                             <Link to={`/products/${product.productId}`} style={{ textDecoration: 'none' }}>
-                            <Card sx={{ maxWidth: 345 }}>
-                                <CardActionArea>
-                                    {product.thumbNailImage.length > 0 && (
-                                        <CardMedia
-                                            component="img"
-                                            height="300"
-                                            image={`${filePath}${product.thumbNailImage[0].storeName}`} // 썸네일 이미지 URL
-                                            alt={product.name}
-                                        />
-                                    )}
-                                    <CardContent>
-                                        <Typography gutterBottom variant="h5" component="div">
-                                            쇼파
-                                        </Typography>
-                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                            1인용 쇼파
-                                        </Typography>
-                                    </CardContent>
-                                </CardActionArea>
-                            </Card>
+                                <Card sx={{ maxWidth: 345 }}>
+                                    <CardActionArea>
+                                        {product.thumbNailImage.length > 0 && (
+                                            <CardMedia
+                                                component="img"
+                                                height="300"
+                                                image={`${filePath}${product.thumbNailImage[0].storeName}`} // 썸네일 이미지 URL
+                                                alt={product.name}
+                                            />
+                                        )}
+                                        <CardContent>
+                                            <Typography variant="h6">{product.name}</Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                {product.price} 원
+                                            </Typography>
+                                        </CardContent>
+                                    </CardActionArea>
+                                </Card>
                             </Link>
                         </Grid>
                     ))}
                 </Grid>
                 <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '40px' }}>
-                <Pagination
-                    count={totalPages}
-                    page={page}
-                    onChange={(event, value) => setPage(value)}
-                    color="primary"
-                />
-            </Box>
+                    <Pagination
+                        count={totalPages}
+                        page={page}
+                        onChange={(event, value) => setPage(value)}
+                        color="primary"
+                    />
+                </Box>
             </Box>
         </>
     );

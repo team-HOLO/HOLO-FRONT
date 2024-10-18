@@ -11,6 +11,8 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import Main from "./pages/Main";
 import ProductManagementPage from "./pages/admin/ProductManagementPage";
 import axios from "axios";
+import ProductList from './components/Product/productList/ProductList';
+import ProductDetails from './components/Product/ProductDetails';
 import ProductList from "./components/Product/ProductList";
 import ProductDetails from "./components/Product/ProductDetails";
 import SignInPage from "./pages/SignInPage";
