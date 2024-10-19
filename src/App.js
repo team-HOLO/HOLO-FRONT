@@ -15,6 +15,7 @@ import ProductList from './components/Product/productList/ProductList';
 import ProductDetails from "./components/Product/ProductDetails";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
+import MyPage from "pages/myPage/MyPage";
 
 const theme = createTheme({
   palette: {
@@ -63,6 +64,7 @@ function App() {
               <Route path="/" element={<Main />} />
               <Route path="products" element={<ProductList />} />
               <Route path="products/:productId" element={<ProductDetails />} />
+              <Route path="/mypage" element={<MyPage />} />
               <Route path="/admin" element={<AdminPage />}>
                 <Route index element={<AdminDashboard />} />
                 <Route
