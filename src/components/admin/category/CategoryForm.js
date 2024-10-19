@@ -9,6 +9,7 @@ const CategoryForm = ({ open, category, onClose, fetchCategories }) => {
     const [parentCategory, setParentCategory] = useState('');
     const [topCategories, setTopCategories] = useState([]);
     const [error, setError] = useState('');
+    const apiUrl = process.env.REACT_APP_API_URL;
 
     useEffect(() => {
         setError(null);
@@ -28,7 +29,7 @@ const CategoryForm = ({ open, category, onClose, fetchCategories }) => {
 
     const fetchTopCategories = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/categories');
+            const response = await axios.get(`${apiUrl}/api/categories`);
             setTopCategories(response.data);
         } catch (error) {
             console.error('Error fetching top categories:', error);
@@ -53,8 +54,8 @@ const CategoryForm = ({ open, category, onClose, fetchCategories }) => {
 
             // 카테고리 여부에 따라 Url 설정
             const url = category
-                ? `http://localhost:8080/api/admin/categories/${category.categoryId}` // 수정 url
-                : 'http://localhost:8080/api/admin/categories';  // 추가 url
+                ? `${apiUrl}/api/admin/categories/${category.categoryId}` // 수정 url
+                : `${apiUrl}/api/admin/categories`;  // 추가 url
 
             // 메서드 결정
             const method = category ? 'put' : 'post';
