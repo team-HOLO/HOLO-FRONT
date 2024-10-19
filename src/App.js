@@ -29,12 +29,14 @@ const theme = createTheme({
   },
 });
 
+const apiUrl=process.env.REACT_APP_API_URL;
+
 function App() {
   const [categories, setCategories] = useState([]);
 
   const fetchCategoriesHeader = useCallback(() => {
     axios
-      .get("/api/categories")
+      .get(`${apiUrl}/api/categories`)
       .then((response) => {
         setCategories(response.data);
       })
@@ -65,8 +67,9 @@ function App() {
             {/* Footer 높이만큼 여백 추가 */}
             <Routes>
               <Route path="/" element={<Main />} />
-              <Route path="products" element={<ProductList />} />
-              <Route path="products/:productId" element={<ProductDetails />} />
+                <Route path="products" element={<ProductList />} />
+                <Route path="products/:productId" element={<ProductDetails />} />
+                <Route path="products/category/:categoryId" element={<ProductList />} />
               <Route path="/mypage" element={<MyPage />} />
               <Route path="/admin" element={<AdminPage />}>
                 <Route index element={<AdminDashboard />} />
