@@ -71,9 +71,7 @@ function Header({ isAdmin, categories, refreshCategories }) {
             refreshCategories={refreshCategories}
           />
         </Box>
-        <Box
-          style={{ flexGrow: 1, display: "flex", justifyContent: "flex-end" }}
-        >
+        <Box style={{ flexGrow: 1, display: "flex", justifyContent: "flex-end" }}>
           {stateIsAdmin && ( // stateIsAdmin이 true일 때만 렌더링
             <Typography style={{ flexGrow: 1 }}>
               <Link
@@ -89,6 +87,9 @@ function Header({ isAdmin, categories, refreshCategories }) {
           style={{ flexGrow: 1, display: "flex", justifyContent: "flex-end" }}
         >
           <AddShoppingCartIcon style={{ fontSize: "24px", margin: "0 10px" }} />
+          <Link to="/cart" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
+          <AddShoppingCartIcon style={{ padding: '0 10px' }} />
+           </Link>
           {isLoggedIn ? (
             <>
               <Button
@@ -127,6 +128,12 @@ function Header({ isAdmin, categories, refreshCategories }) {
               </Button>
             </>
           )}
+          <Link
+            to="/signin"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            <LoginIcon style={{ fontSize: "24px", margin: "0 10px" }} />
+          </Link>
         </Box>
       </Toolbar>
     </AppBar>
