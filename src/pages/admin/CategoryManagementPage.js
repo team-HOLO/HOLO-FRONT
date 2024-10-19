@@ -15,6 +15,8 @@ const CategoryManagementPage = ({ refreshCategories }) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
+  const apiUrl=process.env.REACT_APP_API_URL;
+
 
   useEffect(() => {
     fetchCategories();
@@ -32,7 +34,7 @@ const CategoryManagementPage = ({ refreshCategories }) => {
   const fetchCategories = async () => {
     const [sortBy, direction] = sortOption.split('_');
     try {
-      const response = await axios.get('/api/admin/categories', {
+      const response = await axios.get(`${apiUrl}/api/admin/categories`, {
         params: {
           page,
           size: 10, // 고정된 페이지 크기
@@ -73,7 +75,7 @@ const CategoryManagementPage = ({ refreshCategories }) => {
 
   const handleFormSubmit = async (newCategory) => {
     try {
-      await axios.post('/api/categories', newCategory);
+      await axios.post(`${apiUrl}/api/categories`, newCategory);
       await fetchCategories(); // 새 카테고리 목록을 먼저 가져옴
       handleFormClose();
     } catch (error) {
@@ -83,7 +85,7 @@ const CategoryManagementPage = ({ refreshCategories }) => {
 
   const handleEdit = async (category) => {
     try {
-      const response = await axios.get(`/api/admin/categories/details/${category.categoryId}`);
+      const response = await axios.get(`${apiUrl}/api/admin/categories/details/${category.categoryId}`);
       setSelectedCategory(response.data);
       setFormOpen(true);
     } catch (error) {
@@ -98,7 +100,7 @@ const CategoryManagementPage = ({ refreshCategories }) => {
 
   const handleDeleteConfirm = async (categoryId) => {
     try {
-      await axios.delete(`/api/admin/categories/${categoryId}`);
+      await axios.delete(`${apiUrl}/api/admin/categories/${categoryId}`);
       await fetchCategories();
       refreshCategories();
       handleFormClose();
