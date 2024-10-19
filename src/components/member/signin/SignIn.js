@@ -112,7 +112,7 @@ export default function SignIn(props) {
       } else {
         console.error("Login failed");
         alert("등록된 회원이 아닙니다!");
-        navigate("/"); // 회원가입 성공 시 /signin 페이지로 리다이렉트
+        navigate("/signin"); // 회원가입 성공 시 /signin 페이지로 리다이렉트
       }
     } catch (error) {
       console.error("An error occurred while logging in: ", error);
@@ -249,7 +249,10 @@ export default function SignIn(props) {
             <Button
               fullWidth
               variant="outlined"
-              onClick={() => alert("Sign in with Google")}
+              onClick={() =>
+                (window.location.href =
+                  "http://localhost:8080/oauth2/authorization/google")
+              }
               startIcon={<GoogleIcon />}
             >
               Sign in with Google

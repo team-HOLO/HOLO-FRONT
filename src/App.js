@@ -11,10 +11,13 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import Main from "./pages/Main";
 import ProductManagementPage from "./pages/admin/ProductManagementPage";
 import axios from "axios";
-import ProductList from './components/Product/productList/ProductList';
+import ProductList from "./components/Product/productList/ProductList";
 import ProductDetails from "./components/Product/ProductDetails";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
+
+import MemberUpdatePage from "./pages/MemberUpdate";
+
 import MyPage from "pages/myPage/MyPage";
 
 const theme = createTheme({
@@ -84,6 +87,7 @@ function App() {
               <Route path="/about" element={<About />} />
               <Route path="/signin" element={<SignInPage />} />
               <Route path="/signup" element={<SignUpPage />} />
+              <Route path="/memberupdate" element={<MemberUpdatePage />} />
             </Routes>
           </div>
           <Footer />
