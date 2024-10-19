@@ -16,7 +16,7 @@ import ProductDetails from "./components/Product/ProductDetails";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 
-import MemberUpdatePage from "./pages/SignUpPage";
+import MemberUpdatePage from "./pages/MemberUpdate";
 
 import MyPage from "pages/myPage/MyPage";
 

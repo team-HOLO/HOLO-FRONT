@@ -47,7 +47,6 @@ export default function MemberUpdate() {
   const navigate = useNavigate();
   const [memberData, setMemberData] = useState({});
   const [nameError, setNameError] = useState(false);
-  const [emailError, setEmailError] = useState(false);
   const [telError, setTelError] = useState(false);
   const [ageError, setAgeError] = useState(false);
   const [gender, setGender] = useState(null);
@@ -64,19 +63,11 @@ export default function MemberUpdate() {
   }, [memberId]);
 
   const validateInputs = () => {
-    const email = document.getElementById("email");
     const name = document.getElementById("name");
     const tel = document.getElementById("tel");
     const age = document.getElementById("age");
 
     let isValid = true;
-
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true);
-      isValid = false;
-    } else {
-      setEmailError(false);
-    }
 
     if (!name.value || name.value.length < 1) {
       setNameError(true);
