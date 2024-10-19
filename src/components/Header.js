@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { AppBar, Toolbar, Typography, Box } from "@mui/material";
+import { AppBar, Toolbar, Typography, Box, Button } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import CategoryMenu from "components/CategoryMenu";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import LoginIcon from "@mui/icons-material/Login";
 
 function Header({ isAdmin, categories, refreshCategories }) {
   const [stateIsAdmin, setStateIsAdmin] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 여부 확인 state
   const location = useLocation(); // 페이지 위치 감지
 
-  // 페이지가 로드되거나 변경될 때마다 관리자 권한을 확인
+  // 페이지가 로드되거나 변경될 때마다 관리자 권한 및 로그인 여부 확인
   useEffect(() => {
     const checkAdminStatus = async () => {
       try {
@@ -24,9 +24,35 @@ function Header({ isAdmin, categories, refreshCategories }) {
       }
     };
 
+    const checkLoginStatus = async () => {
+      try {
+        const response = await fetch("/api/members/check-login", {
+          method: "GET",
+          credentials: "include", // 쿠키 포함
+        });
+        const data = await response.json();
+        setIsLoggedIn(data); // 로그인 여부 설정
+      } catch (error) {
+        console.error("Error checking login status:", error);
+      }
+    };
+
     checkAdminStatus(); // 권한 확인 함수 호출
+    checkLoginStatus(); // 로그인 여부 확인 함수 호출
     refreshCategories(); // 카테고리 정보 새로고침
   }, [location, refreshCategories]); // location이 변경될 때마다 실행
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/members/logout", {
+        method: "POST",
+        credentials: "include", // 쿠키 포함
+      });
+      setIsLoggedIn(false); // 로그아웃 후 로그인 상태 변경
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
 
   return (
     <AppBar
@@ -63,12 +89,44 @@ function Header({ isAdmin, categories, refreshCategories }) {
           style={{ flexGrow: 1, display: "flex", justifyContent: "flex-end" }}
         >
           <AddShoppingCartIcon style={{ fontSize: "24px", margin: "0 10px" }} />
-          <Link
-            to="/signin"
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            <LoginIcon style={{ fontSize: "24px", margin: "0 10px" }} />
-          </Link>
+          {isLoggedIn ? (
+            <>
+              <Button
+                component={Link}
+                to="/mypage"
+                color="inherit"
+                style={{ margin: "0 10px" }}
+              >
+                마이페이지
+              </Button>
+              <Button
+                color="inherit"
+                onClick={handleLogout}
+                style={{ margin: "0 10px" }}
+              >
+                로그아웃
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                component={Link}
+                to="/signin"
+                color="inherit"
+                style={{ margin: "0 10px" }}
+              >
+                로그인
+              </Button>
+              <Button
+                component={Link}
+                to="/signup"
+                color="inherit"
+                style={{ margin: "0 10px" }}
+              >
+                회원가입
+              </Button>
+            </>
+          )}
         </Box>
       </Toolbar>
     </AppBar>
