@@ -16,7 +16,7 @@ import { Add, Remove, Delete } from "@mui/icons-material";
 // 상품 데이터는 id를 통해 가격, 이름 및 이미지를 관리합니다.
 const productsData = [
   { id: 1, name: "의자(chair)", price: 29000, image: "chair.jpg" },
-  { id: 2, name: "탁자", price: 49000, image: "table.jpg" },
+  { id: 2, name: "탁자(table)", price: 49000, image: "table.jpg" },
   { id: 3, name: "커튼", price: 30000, image: "curtain.jpg" },
 ];
 
