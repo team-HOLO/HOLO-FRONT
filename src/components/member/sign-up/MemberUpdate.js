@@ -2,7 +2,6 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
-import Divider from "@mui/material/Divider";
 import FormLabel from "@mui/material/FormLabel";
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
@@ -13,8 +12,8 @@ import { styled } from "@mui/material/styles";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import { useNavigate, useParams } from "react-router-dom"; // useParams를 사용해 URL에서 회원 ID를 얻음
-import { useEffect, useState } from "react"; // useState와 useEffect 추가
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -43,7 +42,6 @@ const UpdateContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function MemberUpdate() {
-  const { memberId } = useParams(); // URL에서 memberId 추출
   const navigate = useNavigate();
   const [memberData, setMemberData] = useState({});
   const [nameError, setNameError] = useState(false);
@@ -52,15 +50,15 @@ export default function MemberUpdate() {
   const [gender, setGender] = useState(null);
 
   useEffect(() => {
-    // 기존 회원 정보를 가져오는 API 호출
-    fetch(`/api/members/${memberId}`)
+    // 로그인된 사용자의 정보를 가져오는 API 호출
+    fetch("/api/members/me")
       .then((response) => response.json())
       .then((data) => {
         setMemberData(data);
         setGender(data.gender ? "Male" : "Female"); // Boolean 값을 "Male" 또는 "Female"로 설정
       })
       .catch((error) => console.error("Error fetching member data:", error));
-  }, [memberId]);
+  }, []);
 
   const validateInputs = () => {
     const name = document.getElementById("name");
@@ -111,7 +109,8 @@ export default function MemberUpdate() {
       age: data.get("age"),
     };
 
-    fetch(`/api/members/${memberId}`, {
+    // 로그인된 사용자의 정보를 수정하는 API 호출
+    fetch(`/api/members/${memberData.memberId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -127,7 +126,7 @@ export default function MemberUpdate() {
       })
       .then((data) => {
         alert("회원 정보가 성공적으로 수정되었습니다.");
-        navigate("/profile"); // 수정 후 프로필 페이지로 이동
+        navigate("/"); // 수정 완료 후 리다이렉트
       })
       .catch((error) => console.error("회원 정보 수정 실패:", error));
   };
@@ -149,6 +148,19 @@ export default function MemberUpdate() {
             onSubmit={handleSubmit}
             sx={{ display: "flex", flexDirection: "column", gap: 2 }}
           >
+            {/* 이메일 표시 */}
+            <FormControl>
+              <FormLabel htmlFor="email">Email (read-only)</FormLabel>
+              <TextField
+                fullWidth
+                id="email"
+                value={memberData.email || ""} // 이메일 값을 동적으로 상태로 설정
+                name="email"
+                disabled
+              />
+            </FormControl>
+
+            {/* 이름 */}
             <FormControl>
               <FormLabel htmlFor="name">Full name</FormLabel>
               <TextField
@@ -157,31 +169,31 @@ export default function MemberUpdate() {
                 required
                 fullWidth
                 id="name"
-                defaultValue={memberData.name} // 기존 데이터로 채워짐
+                value={memberData.name || ""} // 기존 데이터로 채워짐
                 error={nameError}
+                onChange={(e) =>
+                  setMemberData({ ...memberData, name: e.target.value })
+                }
               />
             </FormControl>
-            <FormControl>
-              <FormLabel htmlFor="email">Email (read-only)</FormLabel>
-              <TextField
-                fullWidth
-                id="email"
-                defaultValue={memberData.email}
-                name="email"
-                disabled
-              />
-            </FormControl>
+
+            {/* 번호 */}
             <FormControl>
               <FormLabel htmlFor="tel">Phone Number</FormLabel>
               <TextField
                 required
                 fullWidth
                 id="tel"
-                defaultValue={memberData.tel}
+                value={memberData.tel || ""}
                 name="tel"
                 error={telError}
+                onChange={(e) =>
+                  setMemberData({ ...memberData, tel: e.target.value })
+                }
               />
             </FormControl>
+
+            {/* 성별 */}
             <FormControl>
               <FormLabel htmlFor="gender">Gender</FormLabel>
               <RadioGroup
@@ -201,17 +213,23 @@ export default function MemberUpdate() {
                 />
               </RadioGroup>
             </FormControl>
+
+            {/* 나이 */}
             <FormControl>
               <FormLabel htmlFor="age">Age</FormLabel>
               <TextField
                 required
                 fullWidth
                 id="age"
-                defaultValue={memberData.age}
+                value={memberData.age || ""}
                 name="age"
                 error={ageError}
+                onChange={(e) =>
+                  setMemberData({ ...memberData, age: e.target.value })
+                }
               />
             </FormControl>
+
             <Button type="submit" fullWidth variant="contained">
               Update Info
             </Button>

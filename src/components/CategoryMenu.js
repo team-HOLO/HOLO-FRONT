@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {Box, MenuItem} from '@mui/material';
+import { useNavigate } from 'react-router-dom'; 
 
 function CategoryMenu({ categories, refreshCategories }) {
     const [activeMenu, setActiveMenu] = useState(null)
+    const navigate = useNavigate(); // useNavigate를 사용
 
     const handleMouseEnter = (event, categoryId) => {
         setActiveMenu(categoryId);
@@ -15,9 +17,9 @@ function CategoryMenu({ categories, refreshCategories }) {
 
     const handleMenuItemClick = (event, categoryId) => {
         refreshCategories();
+        navigate(`/products/category/${categoryId}`);
         handleClose();
     };
-
 
     return (
         <Box style={{ display: 'flex' }}>
