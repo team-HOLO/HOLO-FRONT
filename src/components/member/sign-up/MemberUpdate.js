@@ -177,7 +177,7 @@ export default function MemberUpdate() {
               />
             </FormControl>
 
-            {/* 전화번호 */}
+            {/* 번호 */}
             <FormControl>
               <FormLabel htmlFor="tel">Phone Number</FormLabel>
               <TextField
