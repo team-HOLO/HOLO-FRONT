@@ -88,7 +88,10 @@ function Header({ isAdmin, categories, refreshCategories }) {
         <Box
           style={{ flexGrow: 1, display: "flex", justifyContent: "flex-end" }}
         >
-          <AddShoppingCartIcon style={{ fontSize: "24px", margin: "0 10px" }} />
+         <Link to="/cart" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
+          <AddShoppingCartIcon style={{ padding: '0 10px' }} />
+           </Link>
+
           {isLoggedIn ? (
             <>
               <Button
