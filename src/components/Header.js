@@ -9,7 +9,7 @@ function Header({ isAdmin, categories, refreshCategories }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 여부 확인 state
   const location = useLocation(); // 페이지 위치 감지
 
-  // 페이지가 로드되거나 변경될 때마다 관리자 권한 및 로그인 여부 확인
+  // 페이지가 로드되거나 변경될 때마다 관리자 권한 및 로그인 여부
   useEffect(() => {
     const checkAdminStatus = async () => {
       try {
