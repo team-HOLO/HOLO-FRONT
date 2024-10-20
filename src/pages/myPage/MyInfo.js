@@ -1,9 +1,9 @@
-// MyInfo.js
-import React from 'react';
-
+// MyInfo
+import React from "react";
+import MemberUpdate from "../../components/member/sign-up/MemberUpdate";
 const MyInfo = () => {
-    console.log('MyInfo component loaded');
-    return <div>My Information</div>;
+  console.log("MyInfo component loaded");
+  return <MemberUpdate />;
 };
 
 export default MyInfo;
