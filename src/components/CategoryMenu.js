@@ -1,70 +1,71 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import {Box, Menu, MenuItem} from '@mui/material';
+import {Box, MenuItem} from '@mui/material';
+import { useNavigate } from 'react-router-dom'; 
 
-function CategoryMenu() {
-    const [categories, setCategories] = useState([]);
-    const [subCategories, setSubCategories] = useState([]);
-    const [anchorEl, setAnchorEl] = useState(null);
-
-    useEffect(() => {
-        // 대분류 카테고리 가져오기
-        axios.get('/api/categories')
-            .then(response => {
-                setCategories(response.data);
-            })
-            .catch(error => console.error('Error fetching top-level categories:', error));
-    }, []);
+function CategoryMenu({ categories, refreshCategories }) {
+    const [activeMenu, setActiveMenu] = useState(null)
+    const navigate = useNavigate(); // useNavigate를 사용
 
     const handleMouseEnter = (event, categoryId) => {
-        setAnchorEl(event.currentTarget);
-        // 대분류 데이터에서 소분류 찾기
-        const selectedCategory = categories.find(category => category.categoryId === categoryId);
-        if (selectedCategory) {
-            setSubCategories(selectedCategory.subCategories);
-        } else {
-            setSubCategories([]);
-        }
+        setActiveMenu(categoryId);
     };
 
     const handleClose = () => {
-        setAnchorEl(null);
+        setActiveMenu(null);
     };
 
     const handleMenuItemClick = (event, categoryId) => {
+        refreshCategories();
+        navigate(`/products/category/${categoryId}`);
         handleClose();
     };
 
     return (
         <Box style={{ display: 'flex' }}>
-            {categories.map(category => (
+            {categories.map((category, index) => (
                 <Box
+                    className={`category${index}`}
                     key={category.categoryId}
                     onMouseEnter={(event) => handleMouseEnter(event, category.categoryId)}
-                    style={{ margin: '20px', cursor: 'pointer' }}
-                    /*
-                                        onMouseLeave={handleClose}
-                    */
+                    style={{ position: 'relative',padding: '20px', cursor: 'pointer' }}
+                    onMouseLeave={handleClose}
                     onClick={(event) => handleMenuItemClick(event, category.categoryId)}
                 >
                     {category.name}
+                    {activeMenu === category.categoryId && <Box
+                        style={{
+                            position: "absolute",
+                            top: '60.5px',
+                            left: 0,
+                            width: "100%",
+                            backgroundColor: 'white',
+                            color: 'rgba(0, 0, 0, 0.87)',
+                            boxShadow: '0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12)',
+                            padding: "2px 0px",
+                            borderRadius: '4px',
+                            minWidth: '200px',
+                            maxWidth: '350px',
+                            wordBreak: 'break-all', // 긴 단어도 줄바꿈 가능
+                            whiteSpace: 'normal',   // 줄바꿈 허용
+                        }}
+                    >
+                        {category.subCategories.map(subCategory => (
+                            <MenuItem
+                                key={subCategory.categoryId}
+                                style={{
+                                    width: "100%",
+                                    wordBreak: 'break-all', // 긴 단어도 줄바꿈 가능
+                                    whiteSpace: 'normal',   // 줄바꿈 허용
+                                }}>
+                                {subCategory.name}
+                            </MenuItem>
+                        ))}
+                    </Box>}
                 </Box>
             ))}
-            <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-                MenuListProps={{
-                    onMouseLeave: handleClose,  // 마우스가 메뉴를 벗어날 때 닫기
-                }}
-            >
-                {subCategories.map(subCategory => (
-                    <MenuItem key={subCategory.categoryId} onClick={handleClose}>
-                        {subCategory.name}
-                    </MenuItem>
-                ))}
-            </Menu>
         </Box>
+
     );
 }
 

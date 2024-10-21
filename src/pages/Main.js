@@ -1,25 +1,58 @@
+import React, { useEffect, useState } from 'react';
 import Carousel from "react-material-ui-carousel";
-import { Typography, Box, Grid } from "@mui/material";
+import { Typography, Box, Grid, Pagination } from "@mui/material";
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
+// import Pagination from '@mui/material';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
+
+
+
 
 function Main() {
+    const filePath = 'https://holo-bucket.s3.ap-northeast-2.amazonaws.com/';
+
     const carouselList = [
         {
             title: "가구",
-            url: `${process.env.PUBLIC_URL}/images/main_image1.jpg`
+            url: 'images/main_image1.jpg'
         },
         {
             title: "주방",
-            url: `${process.env.PUBLIC_URL}/images/main_image2.jpg`
+            url: 'images/main_image2.jpg'
         },
         {
             title: "소품",
-            url: `${process.env.PUBLIC_URL}/images/main_image3.jpg`
+            url: 'images/main_image3.jpg'
         }
     ];
+
+    const fetchProducts = async (page, size) => {
+        const response = await axios.get('api/products', {
+            params: {
+                page: page,
+                size: size,
+            },
+        });
+        return response.data;
+    }
+
+
+    const [products, setProducts] = useState([]);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+
+    useEffect(() => {
+        const loadProducts = async () => {
+            const data = await fetchProducts(page - 1, 8); // 페이지는 0부터 시작하므로 -1
+            setProducts(data.content);
+            setTotalPages(data.totalPages);
+        };
+        loadProducts();
+    }, [page]);
 
     return (
         <>
@@ -54,31 +87,41 @@ function Main() {
                 ))}
             </Carousel>
             <Box sx={{ padding: '30px 10%' }}>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 3 }}>New Arrivals</Typography> {/* 여기에 간격 추가 */}
-                <Grid container spacing={2}>
-                    {[...Array(4)].map((_, index) => (
-                        <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                            <Card sx={{ maxWidth: 345 }}>
-                                <CardActionArea>
-                                    <CardMedia
-                                        component="img"
-                                        height="300"
-                                        image={`${process.env.PUBLIC_URL}/images/main_image1.jpg`}
-                                        alt="쇼파"
-                                    />
-                                    <CardContent>
-                                        <Typography gutterBottom variant="h5" component="div">
-                                            쇼파
-                                        </Typography>
-                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                            1인용 쇼파
-                                        </Typography>
-                                    </CardContent>
-                                </CardActionArea>
-                            </Card>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 3 }}>New Arrivals</Typography>
+                <Grid container spacing={7}>
+                    {products.map((product) => (
+                        <Grid item xs={12} sm={6} md={4} lg={3} key={product.productId}>
+                            <Link to={`/products/${product.productId}`} style={{ textDecoration: 'none' }}>
+                                <Card sx={{ maxWidth: 345 }}>
+                                    <CardActionArea>
+                                        {product.thumbNailImage.length > 0 && (
+                                            <CardMedia
+                                                component="img"
+                                                height="300"
+                                                image={`${filePath}${product.thumbNailImage[0].storeName}`} // 썸네일 이미지 URL
+                                                alt={product.name}
+                                            />
+                                        )}
+                                        <CardContent>
+                                            <Typography variant="h6">{product.name}</Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                {product.price} 원
+                                            </Typography>
+                                        </CardContent>
+                                    </CardActionArea>
+                                </Card>
+                            </Link>
                         </Grid>
                     ))}
                 </Grid>
+                <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '40px' }}>
+                    <Pagination
+                        count={totalPages}
+                        page={page}
+                        onChange={(event, value) => setPage(value)}
+                        color="primary"
+                    />
+                </Box>
             </Box>
         </>
     );
