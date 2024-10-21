@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Typography, Button, Box, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+
+const filePath = 'https://holo-bucket.s3.ap-northeast-2.amazonaws.com/'
 
 const ProductForm = ({ open, product, onClose }) => {
     const [newProduct, setNewProduct] = useState({
@@ -24,6 +26,7 @@ const ProductForm = ({ open, product, onClose }) => {
 
     const [subCategories, setSubCategories] = useState([]);
     const [selectedSubCategory, setSelectedSubCategory] = useState('');
+    const [optionError, setOptionError] = useState('');
 
     useEffect(() => {
 
@@ -39,16 +42,20 @@ const ProductForm = ({ open, product, onClose }) => {
 
         // 제품이 존재하는 경우: 수정
         if (product) {
+            const imageUrls = product.productImageDtos.map(image => `${filePath}${image.storeName}`)
             setNewProduct({
                 name: product.name,
                 price: product.price,
                 description: product.description,
                 stockQuantity: product.stockQuantity,
                 productOptions: product.productOptions || [{ color: '', size: '' }],
-                images: product.productImageDtos || [],
+                images: imageUrls || [], // storeName으로 설정
                 // files: product.files || [],
                 thumbnails: product.isThumbnails || [],
+                categoryId: product.categoryId,
             });
+
+            setSelectedSubCategory(product.categoryId); // 서버에서 받아온 카테고리 ID로 설정
         }
         // 제품이 존재하지 않는 경우: 새로 생성
         else {
@@ -63,6 +70,7 @@ const ProductForm = ({ open, product, onClose }) => {
                 thumbnails: [],
                 categoryId: '',
             });
+            setSelectedSubCategory(''); // 새로운 상품 추가 시 하위 카테고리 초기화
         }
     }, [product]);
 
@@ -151,6 +159,16 @@ const ProductForm = ({ open, product, onClose }) => {
         });
     };
 
+    const handleOptionDelete = (index) => {
+        setNewProduct((prevProduct) => {
+            const updatedOptions = prevProduct.productOptions.filter((_, i) => i !== index);
+            return {
+                ...prevProduct,
+                productOptions: updatedOptions,
+            };
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -180,63 +198,111 @@ const ProductForm = ({ open, product, onClose }) => {
             hasError = true;
         }
 
+        // 옵션 검증
+        if (newProduct.productOptions.length === 0) {
+            setOptionError('최소 하나의 옵션이 필요합니다.');
+            hasError = true;
+        } else {
+            newProduct.productOptions.forEach((option, index) => {
+                if (!option.color || !option.size) {
+                    setOptionError(`옵션의 색상과 사이즈를 모두 입력해주세요.`);
+                    hasError = true;
+                }
+            });
+        }
+
+
         if (hasError) return; // 에러가 있으면 제출하지 않음
 
         const isThumbnailList = newProduct.images.map((_, index) => newProduct.thumbnails.includes(index));
         const formData = new FormData();
-        formData.append('addProductRequest', new Blob([JSON.stringify({
-            name: newProduct.name,
-            price: parseInt(newProduct.price, 10),
-            description: newProduct.description,
-            stockQuantity: parseInt(newProduct.stockQuantity, 10),
-            productOptions: newProduct.productOptions,
-            isThumbnails: isThumbnailList,
-            categoryId: newProduct.categoryId, // 선택된 카테고리 ID 추가
-        })], { type: 'application/json' }));
+        const updateFormData = new FormData();
 
-        newProduct.images.forEach((image, index) => {
-            const file = newProduct.files[index];
-            if (file) {
-                formData.append('productImages', file); // 'productImages'는 서버에서 받을 필드 이름
-            }
-        });
-
-        //상품 새로 생성
         if (!product) {
-            try {
+            //상품 추가용 form
+            formData.append('addProductRequest', new Blob([JSON.stringify({
+                name: newProduct.name,
+                price: parseInt(newProduct.price, 10),
+                description: newProduct.description,
+                stockQuantity: parseInt(newProduct.stockQuantity, 10),
+                productOptions: newProduct.productOptions,
+                isThumbnails: isThumbnailList,
+                categoryId: newProduct.categoryId, // 선택된 카테고리 ID 추가
+            })], { type: 'application/json' }));
 
-                const response = await axios.post('http://localhost:8080/api/products', formData);
-                if (response.ok) {
-                    const data = await response.json();
-                    alert('상품 등록 성공');
+            newProduct.images.forEach((image, index) => {
+                const file = newProduct.files[index];
+                if (file) {
+                    formData.append('productImages', file); // 'productImages'는 서버에서 받을 필드 이름
+                }
+            });
+
+        } else {
+            //상품 수정용 form
+            updateFormData.append('updateProductRequest', new Blob([JSON.stringify({
+                name: newProduct.name,
+                price: parseInt(newProduct.price, 10),
+                description: newProduct.description,
+                stockQuantity: parseInt(newProduct.stockQuantity, 10),
+                productOptions: newProduct.productOptions,
+                isThumbnails: isThumbnailList,
+                categoryId: newProduct.categoryId,
+            })], { type: 'application/json' }));
+
+        }
+
+        try {
+            if (!product) {
+                const response = await axios.post(
+                    'http://localhost:8080/api/admin/products',
+                    formData,
+                    {
+                        withCredentials: true,  // 쿠키에 저장된 JWT를 자동으로 전송
+                    }
+                );
+
+                // 응답 처리
+                if (response.status === 200) {
+                    alert('상품 등록 성공'); // 상품 생성 성공 알림
+                    onClose(); // 창 닫기
                 } else {
                     setError('상품 등록 실패');
                 }
-            } catch (error) {
-                console.error('서버 오류:', error);
-                return;
-            }
-        } else {  //카테고리 수정
-            try {
+            } else {
+                const response = await axios.put(
+                    `http://localhost:8080/api/admin/products/${product.productId}`,
+                    updateFormData,
+                    {
+                        withCredentials: true,  // 쿠키에 저장된 JWT를 자동으로 전송
+                    }
+                );
 
-                const response = await axios.put('http://localhost:8080/api/products/${product.productId}', formData);
-
-                if (response.ok) {
-                    const data = await response.json();
-                    alert('상품 수정 성공');
+                // 응답 처리
+                if (response.status === 200) {
+                    alert('상품 수정 성공'); // 상품 수정 성공 알림
+                    onClose(); // 창 닫기
                 } else {
                     setError('상품 수정 실패');
                 }
-            } catch (error) {
-                // setError('필수 입력값입니다.');
-                console.error('서버 오류:', error);
-                return;
+            }
+            window.location.reload(); // 페이지 새로고침
+        } catch (error) {
+            if (error.response && error.response.status === 409) {
+                setError('이미 존재하는 상품명입니다.');
+            } else {
+                setError('상품 추가/수정 중 오류가 발생했습니다.');
             }
         }
 
-        onClose();
-        window.location.reload();
     };
+
+    useEffect(() => {
+        return () => {
+            newProduct.images.forEach(imageUrl => {
+                URL.revokeObjectURL(imageUrl);
+            });
+        };
+    }, [newProduct.images]);
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -250,8 +316,8 @@ const ProductForm = ({ open, product, onClose }) => {
                         value={newProduct.name}
                         onChange={handleChange}
                         margin="normal"
-                        error={!!nameError}
-                        helperText={nameError}
+                        error={!!nameError || !!error} // 두 가지 에러 상태를 모두 확인
+                        helperText={nameError || error} // 한쪽 에러 메시지를 표시
                         required
                     />
                     <TextField
@@ -310,8 +376,9 @@ const ProductForm = ({ open, product, onClose }) => {
                         </Select>
                     </FormControl>
 
+                    {/* 옵션 목록 표시 */}
                     {newProduct.productOptions.map((option, index) => (
-                        <div key={index}>
+                        <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
                             <TextField
                                 label="색상"
                                 type="text"
@@ -332,21 +399,37 @@ const ProductForm = ({ open, product, onClose }) => {
                                 margin="normal"
                                 required
                             />
-                            <Button variant="contained" onClick={addOption}>
-                                옵션 추가
+                            <Button
+                                variant="outlined"
+                                color="secondary"
+                                size="medium"
+                                onClick={() => handleOptionDelete(index)}
+                                style={{ marginLeft: '10px' }}
+                            >
+                                <Typography variant="body2" style={{ fontSize: '0.75rem' }}>
+                                    삭제
+                                </Typography>
                             </Button>
                         </div>
                     ))}
+                    {/* 옵션 에러 메시지 표시 */}
+                    {optionError && <Typography color="error" variant="caption">{optionError}</Typography>}
+
+                    {/* 옵션 추가 버튼을 아래에 하나만 배치 */}
+                    <Button variant="contained" onClick={addOption} style={{ marginTop: '10px' }}>
+                        옵션 추가
+                    </Button>
+
                     <h3>상품 이미지</h3>
-                    <input
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        error={!!error}
-                        helperText={error}
-                        required
-                    />
+                    {!product && (  // product가 없을 때만 렌더링
+                        <input
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            required
+                        />
+                    )}
                     {imageError && <div style={{ color: 'red' }}>{imageError}</div>}
                     <h3>이미지 미리보기</h3>
                     {thumbnailImageError && <div style={{ color: 'red' }}>{thumbnailImageError}</div>}

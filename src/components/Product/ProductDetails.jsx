@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate  } from 'react-router-dom';
 import { TextField, Button, Box, Grid, Card, CardMedia, CardContent, Typography, MenuItem, Divider } from '@mui/material';
 import Carousel from "react-material-ui-carousel";
 
@@ -9,7 +9,7 @@ import Carousel from "react-material-ui-carousel";
 const ProductDetails = () => {
 
     const filePath = 'https://holo-bucket.s3.ap-northeast-2.amazonaws.com/';
-
+    const navigate = useNavigate();
 
     // 상태 관리
     const [selectedOption, setSelectedOption] = useState('');
@@ -17,6 +17,7 @@ const ProductDetails = () => {
     const [size, setSelectedSize] = useState('');
     const [quantity, setQuantity] = useState(1);
     const [optionError, setOptionError] = useState('');
+    const [error, setError] = useState('');
 
     const [product, setProduct] = useState(null);
     const { productId } = useParams() // URL에서 productId 가져오기
@@ -57,17 +58,24 @@ const ProductDetails = () => {
         };
     
         try {
-            const response = await axios.post('/api/cart', data, {
+            const response = await axios.post(
+                '/api/cart', 
+                data, 
+                
+                {
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
-
             console.log('장바구니에 추가되었습니다:', response.data);
-
-            //alert 추가 
         } catch (error) {
-            console.error('장바구니 추가 중 오류 발생:', error);
+            if (error.response && (error.response.status === 403 || error.response.status === 401)) {
+                if (window.confirm('로그인 후 이용가능합니다. 로그인 페이지로 이동하시겠습니까?')) {
+                    navigate('/signIn'); // React Router를 사용하여 로그인 페이지로 이동
+                }
+            } else {
+                setError('장바구니 담기 중 오류 발생');
+            }
         }
     };
 
@@ -95,10 +103,14 @@ const ProductDetails = () => {
             });
 
             console.log('주문이 완료되었습니다.', response.data);
-
-            //alert 추가 
         } catch (error) {
-            console.error('주문 중 오류 발생:', error);
+            if (error.response && (error.response.status === 403 || error.response.status === 401)) {
+                if (window.confirm('로그인 후 이용가능합니다. 로그인 페이지로 이동하시겠습니까?')) {
+                    navigate('/login'); 
+                }
+            } else {
+                setError('장바구니 담기 중 오류 발생');
+            }
         }
     };
 
@@ -203,9 +215,6 @@ const ProductDetails = () => {
                                         </Typography>
                                     </Box>
                                 )}
-
-
-
                                 <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
                                     <Button variant="contained" color="primary" style={{ marginRight: '20px' }} onClick={handleAddToCart} >
                                         장바구니 담기
