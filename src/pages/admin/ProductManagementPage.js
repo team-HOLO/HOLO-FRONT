@@ -99,6 +99,11 @@ const ProductManagementPage = () => {
         onClose={() => setDeleteDialogOpen(false)}
         onDelete={handleDeleteConfirm}
       />
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
     </Container>
   );
 };
