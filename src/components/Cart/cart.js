@@ -30,7 +30,6 @@ const App = () => {
       { id: 1, name: "의자", price: 10000, image: "image1_url" },
       { id: 2, name: "소파", price: 20000, image: "image2_url" },
       { id: 3, name: "탁자", price: 30000, image: "image3_url" },
-      // 추가 상품...
     ];
     setProducts(storedProducts);
   }, []);
@@ -64,13 +63,15 @@ const App = () => {
 
   // 수량 변경 함수
   const handleQuantityChange = (id, amount) => {
-    setCart((prevCart) =>
-      prevCart.map((item) =>
+    setCart((prevCart) => {
+      const updatedCart = prevCart.map((item) =>
         item.productId === id
           ? { ...item, quantity: Math.max(1, item.quantity + amount) }
           : item
-      )
-    );
+      );
+      localStorage.setItem("cart", JSON.stringify(updatedCart)); // 로컬 스토리지 업데이트
+      return updatedCart;
+    });
   };
 
   // 아이템 삭제 함수
@@ -80,11 +81,12 @@ const App = () => {
 
   // 체크된 아이템 삭제
   const handleDeleteChecked = () => {
-    setCart((prevCart) =>
-      prevCart.filter((item) => !checkedItems.includes(item.productId))
-    );
-    setCheckedItems([]);
-    localStorage.setItem("cart", JSON.stringify(cart)); // 로컬 스토리지 업데이트
+    setCart((prevCart) => {
+      const updatedCart = prevCart.filter((item) => !checkedItems.includes(item.productId));
+      localStorage.setItem("cart", JSON.stringify(updatedCart)); // 로컬 스토리지 업데이트
+      return updatedCart;
+    });
+    setCheckedItems([]); // 체크된 아이템 초기화
   };
 
   // 전체 아이템 선택/해제
@@ -196,7 +198,10 @@ const App = () => {
           <Button variant="contained" onClick={handleDeleteChecked}>
             선택된 항목 삭제
           </Button>
-          <Button variant="contained" color="secondary" onClick={() => setCart([])}>
+          <Button variant="contained" color="secondary" onClick={() => {
+            setCart([]);
+            localStorage.setItem("cart", JSON.stringify([])); // 로컬 스토리지도 빈 배열로 업데이트
+          }}>
             전체 삭제
           </Button>
         </Box>
