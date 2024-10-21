@@ -44,19 +44,43 @@ function Main() {
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [currentImages, setCurrentImages] = useState({}); // 각 제품의 현재 이미지를 저장할 객체
+    const [zoomedIn, setZoomedIn] = useState(null); // 줌인 상태 관리
 
     useEffect(() => {
         const loadProducts = async () => {
-            const data = await fetchProducts(page - 1, 8); // 페이지는 0부터 시작하므로 -1
+            const data = await fetchProducts(page - 1, 8);
             setProducts(data.content);
             setTotalPages(data.totalPages);
+            // 초기 이미지 설정
+            const initialImages = {};
+            data.content.forEach(product => {
+                initialImages[product.productId] = product.thumbNailImage[0]?.storeName || '';
+            });
+            setCurrentImages(initialImages);
         };
         loadProducts();
     }, [page]);
 
+    const handleMouseEnter = (productId) => {
+        setCurrentImages((prevImages) => ({
+            ...prevImages,
+            [productId]: products.find(product => product.productId === productId).thumbNailImage[1]?.storeName || '',
+        }));
+    };
+
+    const handleMouseLeave = (productId) => {
+        setCurrentImages((prevImages) => ({
+            ...prevImages,
+            [productId]: products.find(product => product.productId === productId).thumbNailImage[0]?.storeName || '',
+        }));
+    };
+
+
+
     return (
         <>
-            <Carousel cycleNavigation={true} navButtonsAlwaysVisible={true}>
+         <Carousel cycleNavigation={true} navButtonsAlwaysVisible={true}>
                 {carouselList.map((carousel, index) => (
                     <Box key={index} sx={{ position: 'relative' }}>
                         <img
@@ -93,13 +117,32 @@ function Main() {
                         <Grid item xs={12} sm={6} md={4} lg={3} key={product.productId}>
                             <Link to={`/products/${product.productId}`} style={{ textDecoration: 'none' }}>
                                 <Card sx={{ maxWidth: 345 }}>
-                                    <CardActionArea>
+                                    <CardActionArea
+                                        onMouseEnter={() => {
+                                            if (product.thumbNailImage.length === 1) {
+                                                setZoomedIn(product.productId); // 줌인 상태 설정
+                                            } else {
+                                                handleMouseEnter(product.productId);
+                                            }
+                                        }}
+                                        onMouseLeave={() => {
+                                            if (product.thumbNailImage.length === 1) {
+                                                setZoomedIn(null); // 줌인 상태 해제
+                                            } else {
+                                                handleMouseLeave(product.productId);
+                                            }
+                                        }}
+                                    >
                                         {product.thumbNailImage.length > 0 && (
                                             <CardMedia
                                                 component="img"
                                                 height="300"
-                                                image={`${filePath}${product.thumbNailImage[0].storeName}`} // 썸네일 이미지 URL
+                                                image={`${filePath}${currentImages[product.productId]}`} // 현재 보여줄 이미지 URL
                                                 alt={product.name}
+                                                style={{
+                                                    transition: 'transform 0.3s',
+                                                    transform: zoomedIn === product.productId ? 'scale(1.1)' : 'scale(1)', // 줌인 효과
+                                                }}
                                             />
                                         )}
                                         <CardContent>
@@ -125,6 +168,7 @@ function Main() {
             </Box>
         </>
     );
+
 }
 
 export default Main;
