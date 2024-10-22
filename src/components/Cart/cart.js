@@ -9,6 +9,7 @@ const Cart = () => {
     const [selectedItems, setSelectedItems] = useState(new Set());
     const filePath = 'https://holo-bucket.s3.ap-northeast-2.amazonaws.com/';
     const shippingFee = 2500; // 배송비 고정
+    const apiUrl = process.env.REACT_APP_API_URL;
 
     useEffect(() => {
         const fetchCart = () => {
@@ -22,7 +23,7 @@ const Cart = () => {
         const fetchProductDetails = async () => {
             try {
                 const detailsPromises = cartItems.map(item =>
-                    axios.get(`/api/products/${item.productId}`)
+                    axios.get(`${apiUrl}/api/products/${item.productId}`)
                 );
                 const responses = await Promise.all(detailsPromises);
                 const details = responses.reduce((acc, response, index) => {
