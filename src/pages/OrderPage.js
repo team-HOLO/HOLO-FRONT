@@ -47,7 +47,7 @@ const OrderPage = () => {
         const fetchProductDetails = async () => {
             try {
                 const productDetailsPromises = orderItems.map(item =>
-                    axios.get`${apiUrl}/api/products/${item.productId}`)
+                    axios.get(`${apiUrl}/api/products/${item.productId}`)
                 );
                 const responses = await Promise.all(productDetailsPromises);
                 setProductDetails(responses.map(response => response.data));
