@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button, Card, CardContent, Grid, Checkbox, IconButton, Paper, Divider } from '@mui/material';
 import { Add, Remove, Delete } from '@mui/icons-material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
+    const navigate = useNavigate();
     const [cartItems, setCartItems] = useState([]);
     const [productDetails, setProductDetails] = useState({});
-    const [selectedItems, setSelectedItems] = useState({});
+    const [selectedItems, setSelectedItems] = useState(new Set());
     const filePath = 'https://holo-bucket.s3.ap-northeast-2.amazonaws.com/';
     const shippingFee = 2500; // 배송비 고정
     const apiUrl = process.env.REACT_APP_API_URL;
@@ -15,15 +17,15 @@ const Cart = () => {
         const fetchCart = () => {
             const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
             setCartItems(storedCart);
-            // 장바구니에 있는 모든 상품의 ID로 초기 선택 상태 설정
-            const initialSelected = {};
-            storedCart.forEach(item => {
-                const key = `${item.productId}-${item.color}-${item.size}`;
-                initialSelected[key] = true; // 모든 아이템을 선택된 상태로 초기화
-            });
-            setSelectedItems(initialSelected);
         };
+
+        const fetchSelectedItems = () => {
+            const storedSelected = JSON.parse(localStorage.getItem('selectedItems')) || [];
+            setSelectedItems(new Set(storedSelected));
+        };
+
         fetchCart();
+        fetchSelectedItems();
     }, []);
 
     useEffect(() => {
@@ -52,16 +54,14 @@ const Cart = () => {
         localStorage.setItem('cart', JSON.stringify(updatedCart));
     };
 
+    const updateSelectedItemsInStorage = (updatedSelected) => {
+        localStorage.setItem('selectedItems', JSON.stringify(Array.from(updatedSelected)));
+    };
+
     const handleRemoveFromCart = (productId, color, size) => {
         const updatedCart = cartItems.filter(item => !(item.productId === productId && item.color === color && item.size === size));
         setCartItems(updatedCart);
         updateLocalStorage(updatedCart);
-
-        // 선택된 아이템 업데이트
-        const key = `${productId}-${color}-${size}`;
-        const updatedSelectedItems = { ...selectedItems };
-        delete updatedSelectedItems[key];
-        setSelectedItems(updatedSelectedItems);
     };
 
     const handleQuantityChange = (productId, color, size, amount) => {
@@ -79,12 +79,13 @@ const Cart = () => {
     const handleSelectItem = (productId, color, size) => {
         const key = `${productId}-${color}-${size}`;
         setSelectedItems(prev => {
-            const updated = { ...prev };
-            if (updated[key]) {
-                delete updated[key];
+            const updated = new Set(prev);
+            if (updated.has(key)) {
+                updated.delete(key);
             } else {
-                updated[key] = true;
+                updated.add(key);
             }
+            updateSelectedItemsInStorage(updated);
             return updated;
         });
     };
@@ -92,34 +93,47 @@ const Cart = () => {
     const handleDeleteSelectedItems = () => {
         const updatedCart = cartItems.filter(item => {
             const key = `${item.productId}-${item.color}-${item.size}`;
-            return !selectedItems[key];
+            return !selectedItems.has(key);
         });
         setCartItems(updatedCart);
-        setSelectedItems({});
+        setSelectedItems(new Set());
         updateLocalStorage(updatedCart);
+        updateSelectedItemsInStorage(new Set());
     };
 
     const handleDeleteAllItems = () => {
         setCartItems([]);
-        setSelectedItems({});
+        setSelectedItems(new Set());
         localStorage.removeItem('cart');
+        localStorage.removeItem('selectedItems');
     };
 
-    // 총 상품 가격 계산
+    // 총 상품 가격 계산 (체크된 상품만 포함)
     const totalPrice = cartItems.reduce((total, item) => {
         const product = productDetails[item.productId];
         const key = `${item.productId}-${item.color}-${item.size}`;
-        if (selectedItems[key]) {
-            return product ? total + product.price * item.quantity : total;
+        if (selectedItems.has(key) && product) {
+            return total + product.price * item.quantity;
         }
         return total;
     }, 0);
 
-    // 총 수량 계산
+    // 총 수량 계산 (체크된 상품만 포함)
     const totalQuantity = cartItems.reduce((total, item) => {
         const key = `${item.productId}-${item.color}-${item.size}`;
-        return selectedItems[key] ? total + item.quantity : total;
+        return selectedItems.has(key) ? total + item.quantity : total;
     }, 0);
+
+    // 체크된 상품만 주문 페이지로 이동
+    const handleProceedToOrder = () => {
+        const selectedProducts = cartItems.filter(item => {
+            const key = `${item.productId}-${item.color}-${item.size}`;
+            return selectedItems.has(key);
+        });
+
+        // 주문 페이지로 이동하며 선택한 상품들 전달
+        navigate('/order', { state: { selectedProducts } });
+    };
 
     return (
         <Box sx={{ padding: 9 }}>
@@ -131,23 +145,29 @@ const Cart = () => {
                     ) : (
                         <>
                             <Box display="flex" alignItems="center" mb={2}>
-                                <Checkbox
-                                    checked={cartItems.length > 0 && Object.keys(selectedItems).length === cartItems.length}
+                                <Checkbox 
+                                    checked={cartItems.length > 0 && cartItems.every(item => {
+                                        const key = `${item.productId}-${item.color}-${item.size}`;
+                                        return selectedItems.has(key);
+                                    })}
                                     onChange={(e) => {
                                         if (e.target.checked) {
-                                            const allSelected = {};
+                                            const allSelected = new Set();
                                             cartItems.forEach(item => {
                                                 const key = `${item.productId}-${item.color}-${item.size}`;
-                                                allSelected[key] = true; // 모든 아이템을 선택된 상태로 설정
+                                                allSelected.add(key);
                                             });
                                             setSelectedItems(allSelected);
+                                            updateSelectedItemsInStorage(allSelected);
                                         } else {
-                                            setSelectedItems({});
+                                            setSelectedItems(new Set());
+                                            updateSelectedItemsInStorage(new Set());
                                         }
                                     }} 
                                 />
                                 <Typography>전체 선택</Typography>
                             </Box>
+
                             {cartItems.map((item, index) => {
                                 const key = `${item.productId}-${item.color}-${item.size}`;
                                 return (
@@ -156,7 +176,7 @@ const Cart = () => {
                                             <Grid container alignItems="center" spacing={2}>
                                                 <Grid item xs={1}>
                                                     <Checkbox 
-                                                        checked={selectedItems[key] || false}
+                                                        checked={selectedItems.has(key)}
                                                         onChange={() => handleSelectItem(item.productId, item.color, item.size)} 
                                                     />
                                                 </Grid>
@@ -220,7 +240,13 @@ const Cart = () => {
                         <Typography variant="h5" sx={{ marginTop: '10px' }}>
                             총 결제 금액: {(totalPrice + shippingFee).toLocaleString()}원
                         </Typography>
-                        <Button variant="contained" color="primary" fullWidth sx={{ marginTop: '20px' }}>
+                        <Button 
+                            variant="contained" 
+                            color="primary" 
+                            fullWidth 
+                            sx={{ marginTop: '20px' }} 
+                            onClick={handleProceedToOrder} // 선택된 상품으로 주문 페이지로 이동
+                        >
                             구매하기
                         </Button>
                     </Paper>
