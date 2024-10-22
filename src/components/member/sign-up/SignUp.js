@@ -14,9 +14,9 @@ import { styled } from "@mui/material/styles";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import { GoogleIcon, SitemarkIcon } from "./CustomIcons";
+import { GoogleIcon } from "./CustomIcons";
 import { useNavigate } from "react-router-dom"; // useNavigate 훅 추가
-
+const apiUrl = process.env.REACT_APP_API_URL;
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -134,7 +134,7 @@ export default function SignUp() {
       isAdmin: false, // 기본 값 false
     };
 
-    fetch("/api/members/signup", {
+    fetch(`${apiUrl}/api/members/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -173,7 +173,6 @@ export default function SignUp() {
       <CssBaseline enableColorScheme />
       <SignUpContainer direction="column" justifyContent="space-between">
         <Card variant="outlined">
-          <SitemarkIcon />
           <Typography
             component="h1"
             variant="h4"
@@ -187,21 +186,7 @@ export default function SignUp() {
             sx={{ display: "flex", flexDirection: "column", gap: 2 }}
           >
             <FormControl>
-              <FormLabel htmlFor="name">Full name</FormLabel>
-              <TextField
-                autoComplete="name"
-                name="name"
-                required
-                fullWidth
-                id="name"
-                placeholder="Jon Snow"
-                error={nameError}
-                helperText={nameErrorMessage}
-                color={nameError ? "error" : "primary"}
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel htmlFor="email">Email</FormLabel>
+              <FormLabel htmlFor="email">이메일</FormLabel>
               <TextField
                 required
                 fullWidth
@@ -232,7 +217,21 @@ export default function SignUp() {
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="tel">Phone Number</FormLabel>
+              <FormLabel htmlFor="name">이름</FormLabel>
+              <TextField
+                autoComplete="name"
+                name="name"
+                required
+                fullWidth
+                id="name"
+                placeholder="홍길동"
+                error={nameError}
+                helperText={nameErrorMessage}
+                color={nameError ? "error" : "primary"}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel htmlFor="tel">전화번호</FormLabel>
               <TextField
                 required
                 fullWidth
@@ -283,7 +282,7 @@ export default function SignUp() {
               variant="contained"
               onClick={validateInputs}
             >
-              Sign up
+              회원 가입
             </Button>
             <Typography sx={{ textAlign: "center" }}>
               Already have an account?{" "}
