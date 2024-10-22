@@ -2,6 +2,9 @@ import React, { useEffect } from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+ const fetchCategories = useCallback(async () => {
+
+ }
 const OrderCompletePage = () => {
     const navigate = useNavigate();
     const location = useLocation();
