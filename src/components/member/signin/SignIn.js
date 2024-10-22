@@ -1,9 +1,9 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
+
 import CssBaseline from "@mui/material/CssBaseline";
-import FormControlLabel from "@mui/material/FormControlLabel";
+
 import Divider from "@mui/material/Divider";
 import FormLabel from "@mui/material/FormLabel";
 import FormControl from "@mui/material/FormControl";
@@ -13,8 +13,8 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
-import ForgotPassword from "./ForgotPassword";
-import { GoogleIcon, SitemarkIcon } from "./CustomIcons";
+
+import { GoogleIcon } from "./CustomIcons";
 import AppTheme from "../theme/AppTheme";
 import ColorModeSelect from "../theme/ColorModeSelect";
 import { useNavigate } from "react-router-dom"; // useNavigate 훅 추가
@@ -66,15 +66,6 @@ export default function SignIn(props) {
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
-  const [open, setOpen] = React.useState(false);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   const handleSubmit = async (event) => {
     event.preventDefault(); // Prevent form from submitting the default way
@@ -153,13 +144,12 @@ export default function SignIn(props) {
           sx={{ position: "fixed", top: "1rem", right: "1rem" }}
         />
         <Card variant="outlined">
-          <SitemarkIcon />
           <Typography
             component="h1"
             variant="h4"
             sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
           >
-            Sign in
+            로그인
           </Typography>
           <Box
             component="form"
@@ -173,7 +163,7 @@ export default function SignIn(props) {
             }}
           >
             <FormControl>
-              <FormLabel htmlFor="email">Email</FormLabel>
+              <FormLabel htmlFor="email">이메일</FormLabel>
               <TextField
                 error={emailError}
                 helperText={emailErrorMessage}
@@ -192,16 +182,7 @@ export default function SignIn(props) {
             </FormControl>
             <FormControl>
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <FormLabel htmlFor="password">Password</FormLabel>
-                <Link
-                  component="button"
-                  type="button"
-                  onClick={handleClickOpen}
-                  variant="body2"
-                  sx={{ alignSelf: "baseline" }}
-                >
-                  Forgot your password?
-                </Link>
+                <FormLabel htmlFor="password">비밀번호</FormLabel>
               </Box>
               <TextField
                 error={passwordError}
@@ -211,35 +192,30 @@ export default function SignIn(props) {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-                autoFocus
                 required
                 fullWidth
                 variant="outlined"
                 color={passwordError ? "error" : "primary"}
               />
             </FormControl>
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
-            <ForgotPassword open={open} handleClose={handleClose} />
+
             <Button
               type="submit"
               fullWidth
               variant="contained"
               onClick={validateInputs}
             >
-              Sign in
+              로그인
             </Button>
             <Typography sx={{ textAlign: "center" }}>
-              Don&apos;t have an account?{" "}
+              계정이 없으신가요?{" "}
               <span>
                 <Link
                   href="/signup"
                   variant="body2"
                   sx={{ alignSelf: "center" }}
                 >
-                  Sign up
+                  회원가입
                 </Link>
               </span>
             </Typography>
@@ -255,7 +231,7 @@ export default function SignIn(props) {
               }
               startIcon={<GoogleIcon />}
             >
-              Sign in with Google
+              구글로 로그인하기
             </Button>
           </Box>
         </Card>
