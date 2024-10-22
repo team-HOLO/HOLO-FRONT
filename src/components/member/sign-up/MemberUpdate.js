@@ -14,7 +14,7 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-
+const apiUrl = process.env.REACT_APP_API_URL;
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -51,7 +51,10 @@ export default function MemberUpdate() {
 
   useEffect(() => {
     // 로그인된 사용자의 정보를 가져오는 API 호출
-    fetch("/api/members/me")
+    fetch(`${apiUrl}/api/members/me`, {
+      method: "GET",
+      credentials: "include", // 쿠키 포함하여 요청
+    })
       .then((response) => response.json())
       .then((data) => {
         setMemberData(data);
@@ -110,12 +113,13 @@ export default function MemberUpdate() {
     };
 
     // 로그인된 사용자의 정보를 수정하는 API 호출
-    fetch(`/api/members/${memberData.memberId}`, {
+    fetch(`${apiUrl}/api/members/${memberData.memberId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(updateData),
+      credentials: "include", // 쿠키 포함하여 요청
     })
       .then((response) => {
         if (response.ok) {

@@ -19,6 +19,7 @@ import AppTheme from "../theme/AppTheme";
 import ColorModeSelect from "../theme/ColorModeSelect";
 import { useNavigate } from "react-router-dom"; // useNavigate 훅 추가
 
+const apiUrl = process.env.REACT_APP_API_URL;
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -77,12 +78,13 @@ export default function SignIn(props) {
     };
 
     try {
-      const response = await fetch("/api/members/login", {
+      const response = await fetch(`${apiUrl}/api/members/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(loginData),
+        credentials: "include",
       });
 
       if (response.ok) {
@@ -226,9 +228,8 @@ export default function SignIn(props) {
               fullWidth
               variant="outlined"
               onClick={() =>
-                (window.location.href =
-                  "http://localhost:8080/oauth2/authorization/google")
-              }
+                (window.location.href = `${process.env.REACT_APP_API_URL}/oauth2/authorization/google`)
+              } // 환경변수를 사용하여 URL 동적으로 설정
               startIcon={<GoogleIcon />}
             >
               구글로 로그인하기
