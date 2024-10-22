@@ -34,7 +34,7 @@ const MyOrderPage = () => {
     const handleCancelOrder = async (orderId) => {
         try {
             await axios.delete(`${apiUrl}/api/orders/${orderId}`, {
-                withCredentials: true
+                withCredentials: true,
             });
             alert('주문이 취소되었습니다.');
             /*fetchOrders();*/
