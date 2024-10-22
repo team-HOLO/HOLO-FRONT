@@ -30,12 +30,14 @@ const theme = createTheme({
   },
 });
 
+const apiUrl = process.env.REACT_APP_API_URL;
+
 function App() {
   const [categories, setCategories] = useState([]);
 
   const fetchCategoriesHeader = useCallback(() => {
     axios
-      .get("/api/categories")
+      .get(`${apiUrl}/api/categories`)
       .then((response) => {
         setCategories(response.data);
       })
