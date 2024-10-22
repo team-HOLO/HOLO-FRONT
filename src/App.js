@@ -15,6 +15,7 @@ import ProductList from "./components/Product/productList/ProductList";
 import ProductDetails from "./components/Product/ProductDetails";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
+import Cart from "./components/Cart/cart";
 
 import MemberUpdatePage from "./pages/MemberUpdate";
 
@@ -67,6 +68,7 @@ function App() {
             {/* Footer 높이만큼 여백 추가 */}
             <Routes>
               <Route path="/" element={<Main />} />
+              <Route path="/cart" element={<Cart />} />
               <Route path="products" element={<ProductList />} />
               <Route path="products/:productId" element={<ProductDetails />} />
               <Route path="products/category/:categoryId" element={<ProductList />} />
