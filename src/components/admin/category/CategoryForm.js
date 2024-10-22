@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 
 // 카테고리 생성, 수정 폼
+const apiUrl = process.env.REACT_APP_API_URL;
 const CategoryForm = ({ open, category, onClose, fetchCategories }) => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
@@ -11,24 +12,24 @@ const CategoryForm = ({ open, category, onClose, fetchCategories }) => {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        setError(null);
+        setError('');
         // 카테고리가 존재하는 경우: 수정
         if (category) {
             setName(category.name);
             setDescription(category.description);
             setParentCategory(category.parentCategory ? category.parentCategory.categoryId : '');
-        } else {
-            // 카테고리가 없는 경우: 초기화
-            setName('');
-            setDescription('');
-            setParentCategory(null);
+            return;
         }
+        // 카테고리가 없는 경우: 초기화
+        setName('');
+        setDescription('');
+        setParentCategory(null);
 
     }, [category, open]);
 
     const fetchTopCategories = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/categories');
+            const response = await axios.get(`${apiUrl}/api/categories`);
             setTopCategories(response.data);
         } catch (error) {
             console.error('Error fetching top categories:', error);
@@ -53,8 +54,8 @@ const CategoryForm = ({ open, category, onClose, fetchCategories }) => {
 
             // 카테고리 여부에 따라 Url 설정
             const url = category
-                ? `http://localhost:8080/api/admin/categories/${category.categoryId}` // 수정 url
-                : 'http://localhost:8080/api/admin/categories';  // 추가 url
+                ? `${apiUrl}/api/admin/categories/${category.categoryId}` // 수정 url
+                : `${apiUrl}/api/admin/categories`;  // 추가 url
 
             // 메서드 결정
             const method = category ? 'put' : 'post';
@@ -103,6 +104,7 @@ const CategoryForm = ({ open, category, onClose, fetchCategories }) => {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         margin="normal"
+                        required
                         error={!!error} // 에러가 있을 경우 true
                         helperText={error} // 에러 메시지 표시
                     />
@@ -122,7 +124,7 @@ const CategoryForm = ({ open, category, onClose, fetchCategories }) => {
                             value={parentCategory || ''}
                             onChange={handleParentIdChange}
                             label="대분류 선택"
-                        >
+                            variant={'outlined'}>
                             <MenuItem value="">
                                 <em>없음</em>
                             </MenuItem>
