@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -17,6 +17,13 @@ const OrderCompletePage = () => {
         return price.toLocaleString() + "원";
     };
 
+    // useEffect로 orderDetails 로그 출력 (첫 렌더링 때만)
+    useEffect(() => {
+        if (orderDetails) {
+            console.log('Order Details:', orderDetails);
+        }
+    }, [orderDetails]);
+
     return (
         <Box sx={{ p: 5 }}>
             <Typography variant="h4" align="center" gutterBottom sx={{ mt: 2, mb: 4 }}>
@@ -32,7 +39,7 @@ const OrderCompletePage = () => {
                                 <Box key={index} sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
                                     <Box sx={{ mr: 1 }}>
                                         <img
-                                            src={`${filePath}${product.productImageDtos[0]?.storeName}`} // 이미지 경로 수정
+                                            src={`${filePath}${product.productImageDtos[0]?.storeName}`}
                                             alt={product.name}
                                             style={{ width: '100px', height: '100px', objectFit: 'cover' }}
                                         />
@@ -40,7 +47,7 @@ const OrderCompletePage = () => {
                                     <Box>
                                         <Typography>상품 이름: {product.name}</Typography>
                                         <Typography>수량: {product.quantity}</Typography>
-                                        <Typography>가격: {formatPrice(product.price)}</Typography> {/* 가격 포맷 함수 사용 */}
+                                        <Typography>가격: {formatPrice(product.price)}</Typography>
                                     </Box>
                                 </Box>
                             ))

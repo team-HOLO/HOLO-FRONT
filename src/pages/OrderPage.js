@@ -21,15 +21,13 @@ const OrderPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
 
     const filePath = 'https://holo-bucket.s3.ap-northeast-2.amazonaws.com/';
-
-
     const itemsPerPage = 3;
     const shippingFee = 2500;
 
     // 초기 주문 항목 설정 및 로컬스토리지에서 가져오기
     useEffect(() => {
         const storedOrder = location.state?.productId
-            ? [location.state]
+            ? [{ productId: location.state.productId, quantity: location.state.quantity, color: location.state.color, size: location.state.size }]
             : JSON.parse(localStorage.getItem('cart')) || [];
 
         setOrderItems(storedOrder);
@@ -39,7 +37,9 @@ const OrderPage = () => {
     useEffect(() => {
         const fetchProductDetails = async () => {
             try {
-                const productDetailsPromises = orderItems.map(item => axios.get(`/api/products/${item.productId}`));
+                const productDetailsPromises = orderItems.map(item =>
+                    axios.get(`/api/products/${item.productId}`)
+                );
                 const responses = await Promise.all(productDetailsPromises);
                 setProductDetails(responses.map(response => response.data));
             } catch (error) {
@@ -69,13 +69,20 @@ const OrderPage = () => {
 
     // 주문 처리
     const handleOrder = async () => {
+        setOrderError(''); // 초기화
         if (!shippingAddress || !recipientName) {
             setOrderError('배송지와 받는 사람의 이름을 입력해주세요');
             return;
         }
 
+        // OrderRequestDto에 맞게 데이터 구조 조정
         const data = {
-            products: orderItems,
+            products: orderItems.map(item => ({
+                productId: item.productId,
+                quantity: item.quantity,
+                color: item.color,
+                size: item.size,
+            })),
             shippingAddress,
             recipientName,
             shippingRequest,
@@ -85,11 +92,23 @@ const OrderPage = () => {
             const response = await axios.post('/api/orders', data, {
                 headers: { 'Content-Type': 'application/json' },
             });
+            // 주문 후 로컬스토리지 비우기
+            localStorage.removeItem('cart');
+            //총가격 계산
+            const totalAmount = productDetails.reduce((total, product, index) => {
+                const itemPrice = product.price * orderItems[index].quantity;
+                return total + itemPrice;
+            }, 0) + shippingFee;
 
+           // 수량 정보를 productDetails와 결합
+                  const orderProductsWithQuantity = productDetails.map((product, index) => ({
+                      ...product,
+                      quantity: orderItems[index].quantity, // 수량 추가
+                  }));
             navigate('/ordercomplete', {
                 state: {
                     orderDetails: {
-                        products: productDetails,
+                        products: orderProductsWithQuantity,
                         recipientName,
                         shippingAddress,
                         shippingRequest,
@@ -99,14 +118,16 @@ const OrderPage = () => {
             });
         } catch (error) {
             console.error('주문 중 오류 발생:', error);
-            setOrderError('주문 중 오류가 발생했습니다.');
+            setOrderError('주문 중 오류가 발생했습니다. 다시 시도해 주세요.');
         }
     };
 
     // 페이지네이션 관련 변수
     const totalPages = Math.ceil(productDetails.length / itemsPerPage);
     const currentProducts = productDetails.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-    const totalPrice = productDetails.reduce((total, product) => total + product.price * product.quantity, 0);
+    const totalPrice = productDetails.reduce((total, product, index) => {
+        return total + (product.price * orderItems[index].quantity); // 상품 가격 계산
+    }, 0);
     const totalAmount = totalPrice + shippingFee;
 
     // 가격 포맷팅 함수
@@ -143,18 +164,17 @@ const OrderPage = () => {
                                         checked={selectedItems.includes(product.productId)}
                                         onChange={() => handleSelectItem(product.productId)}
                                     />
-                                   <img
-                                       src={`${filePath}${product.productImageDtos[0]?.storeName}`}
-                                       alt={product.name}
-                                       style={{ width: '190px', height: '190px', objectFit: 'cover' }}
-                                   />
-
+                                    <img
+                                        src={`${filePath}${product.productImageDtos[0]?.storeName}`}
+                                        alt={product.name}
+                                        style={{ width: '190px', height: '190px', objectFit: 'cover' }}
+                                    />
                                     <Box>
                                         <Typography>상품 이름: {product.name}</Typography>
-                                        <Typography>수량: {product.quantity}</Typography>
-                                        <Typography>색상: {product.color}</Typography>
-                                        <Typography>사이즈: {product.size}</Typography>
-                                        <Typography>가격: {formatPrice(product.price)}</Typography>
+                                        <Typography>수량: {orderItems[index].quantity}</Typography>
+                                        <Typography>색상: {orderItems[index].color}</Typography>
+                                        <Typography>사이즈: {orderItems[index].size}</Typography>
+                                        <Typography>가격: {formatPrice(product.price * orderItems[index].quantity)}</Typography>
                                     </Box>
                                 </Box>
                             </Box>
