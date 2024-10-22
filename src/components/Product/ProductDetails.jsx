@@ -10,6 +10,7 @@ const ProductDetails = () => {
 
     const filePath = 'https://holo-bucket.s3.ap-northeast-2.amazonaws.com/';
     const navigate = useNavigate();
+    const apiUrl = process.env.REACT_APP_API_URL;
 
     // 상태 관리
     const [selectedOption, setSelectedOption] = useState('');
@@ -30,7 +31,7 @@ const ProductDetails = () => {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const response = await axios.get(`/api/products/${productId}`);
+                const response = await axios.get(`${apiUrl}/api/products/${productId}`);
                 setProduct(response.data);
             } catch (error) {
                 console.error('Error fetching product:', error);
@@ -51,8 +52,27 @@ const handleAddToCart = async () => {
     setOptionError(''); // 오류 메시지 초기화
 
     try {
+
+        const loginData = await axios.get(
+            `${apiUrl}/api/members/check-login`,
+            {
+                withCredentials: true,  // 쿠키에 저장된 JWT를 자동으로 전송
+            }
+        );
+        const isLogin = loginData.data;
+    
+        if (!isLogin) {
+            const confirmed = window.confirm('로그인 후 이용 가능합니다. 로그인 페이지로 이동하시겠습니까?');
+            if (confirmed) {
+                navigate('/signIn'); // 사용자가 확인한 경우 로그인 페이지로 이동
+            } else {
+                // 취소한 경우 추가 작업이 필요 없다면 아무 것도 하지 않음
+                window.close(); // 현재 창을 닫음 (브라우저 정책에 따라 동작하지 않을 수 있음)
+            }
+        }
+
         // 현재 상품 정보를 가져오기 (예: API 호출 또는 상태에서)
-        const productData = await axios.get(`/api/products/${productId}`); // 상품 정보 가져오기
+        const productData = await axios.get(`${apiUrl}/api/products/${productId}`); // 상품 정보 가져오기
         const product = productData.data;
 
         const data = {
@@ -141,10 +161,11 @@ const handleOrder = async () => {
     };
 
     try {
-        const response = await axios.post('/api/orders', data, {
+        const response = await axios.post(`${apiUrl}/api/orders`, data, {
             headers: {
                 'Content-Type': 'application/json',
             },
+            withCredentials: true,  // 쿠키에 저장된 JWT를 자동으로 전송  
         });
 
         // 성공적으로 주문 후 order 페이지로 이동

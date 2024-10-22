@@ -18,10 +18,11 @@ const ProductList = () => {
     const [pageSize, setPageSize] = useState(20); // 페이지 당 아이템 수 (기본값 20)
     const [zoomedIn, setZoomedIn] = useState(null); // 줌인 상태 관리
     const [currentImages, setCurrentImages] = useState({});
+    const apiUrl = process.env.REACT_APP_API_URL;
 
     // API 호출 함수
     const fetchProducts = () => {
-        axios.get(`/api/products/category/${categoryId}`, {
+        axios.get(`${apiUrl}/api/products/category/${categoryId}`, {
             params: {
                 productName: productSearchCond,
                 sortBy: sortBy,

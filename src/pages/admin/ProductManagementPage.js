@@ -15,6 +15,7 @@ const ProductManagementPage = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [error, setError] = useState(''); // 에러 상태 추가
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     fetchProducts();
@@ -22,12 +23,14 @@ const ProductManagementPage = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('/api/admin/products', {
-        params: {
-          page,
-          size: 10, // 고정된 페이지 크기
-        },
-      });
+      const response = await axios.get(`${apiUrl}/api/admin/products`,
+        {
+          withCredentials: true,  // 쿠키에 저장된 JWT를 자동으로 전송
+          params: {
+            page,
+            size: 10, // 고정된 페이지 크기
+          },
+        });
       setProducts(response.data.content);
       setTotalElements(response.data.totalElements);
       setError(''); // 성공시 에러 초기화
@@ -44,7 +47,11 @@ const ProductManagementPage = () => {
   };
 
   const handleFormSubmit = (newProduct) => {
-    axios.post('/api/admin/products', newProduct)
+    axios.post(`${apiUrl}/api/admin/products`,
+      {
+        withCredentials: true,  // 쿠키에 저장된 JWT를 자동으로 전송
+      },
+      newProduct)
       .then(() => {
         fetchProducts();
         setFormOpen(false);
@@ -59,7 +66,11 @@ const ProductManagementPage = () => {
 
   const handleEdit = async (product) => {
     try {
-      const response = await axios.get(`/api/products/${product.productId}`);
+      const response = await axios.get(`${apiUrl}/api/products/${product.productId}`,
+        {
+          withCredentials: true,  // 쿠키에 저장된 JWT를 자동으로 전송
+        }
+      );
       setSelectedProduct(response.data);
       setFormOpen(true);
     } catch (error) {
@@ -77,7 +88,11 @@ const ProductManagementPage = () => {
 
   const handleDeleteConfirm = async (productId) => {
     try {
-      await axios.delete(`/api/admin/products/${productId}`);
+      await axios.delete(`${apiUrl}/api/admin/products/${productId}`,
+        {
+          withCredentials: true,  // 쿠키에 저장된 JWT를 자동으로 전송
+        }
+      );
       setDeleteDialogOpen(false);
       await fetchProducts();
     } catch (error) {
@@ -131,10 +146,10 @@ const ProductManagementPage = () => {
           />
         </>
       )}
-    <br></br>
-    <br></br>
-    <br></br>
-    <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
     </Container>
   );
 };
