@@ -27,10 +27,11 @@ const ProductForm = ({ open, product, onClose }) => {
     const [subCategories, setSubCategories] = useState([]);
     const [selectedSubCategory, setSelectedSubCategory] = useState('');
     const [optionError, setOptionError] = useState('');
+    const apiUrl = process.env.REACT_APP_API_URL;
 
     useEffect(() => {
 
-        axios.get('/api/categories/all')
+        axios.get(`${apiUrl}/api/categories/all`)
             .then(response => {
                 // 모든 하위 카테고리를 추출하여 상태로 저장
                 const allSubCategories = response.data.flatMap(category => category.subCategories);
@@ -254,7 +255,7 @@ const ProductForm = ({ open, product, onClose }) => {
         try {
             if (!product) {
                 const response = await axios.post(
-                    'http://localhost:8080/api/admin/products',
+                    `${apiUrl}/api/admin/products`,
                     formData,
                     {
                         withCredentials: true,  // 쿠키에 저장된 JWT를 자동으로 전송
@@ -262,7 +263,7 @@ const ProductForm = ({ open, product, onClose }) => {
                 );
 
                 // 응답 처리
-                if (response.status === 200) {
+                if (response.status === 201) {
                     alert('상품 등록 성공'); // 상품 생성 성공 알림
                     onClose(); // 창 닫기
                 } else {
@@ -270,7 +271,7 @@ const ProductForm = ({ open, product, onClose }) => {
                 }
             } else {
                 const response = await axios.put(
-                    `http://localhost:8080/api/admin/products/${product.productId}`,
+                    `${apiUrl}/api/admin/products/${product.productId}`,
                     updateFormData,
                     {
                         withCredentials: true,  // 쿠키에 저장된 JWT를 자동으로 전송
