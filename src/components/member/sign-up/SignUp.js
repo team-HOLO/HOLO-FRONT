@@ -17,6 +17,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import { GoogleIcon } from "./CustomIcons";
 import { useNavigate } from "react-router-dom"; // useNavigate 훅 추가
 const apiUrl = process.env.REACT_APP_API_URL;
+
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -68,7 +69,7 @@ export default function SignUp() {
 
     if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
       setEmailError(true);
-      setEmailErrorMessage("Please enter a valid email address.");
+      setEmailErrorMessage("올바른 이메일 주소를 입력하세요.");
       isValid = false;
     } else {
       setEmailError(false);
@@ -77,7 +78,7 @@ export default function SignUp() {
 
     if (!password.value || password.value.length < 6) {
       setPasswordError(true);
-      setPasswordErrorMessage("Password must be at least 6 characters long.");
+      setPasswordErrorMessage("비밀번호는 최소 6자 이상이어야 합니다.");
       isValid = false;
     } else {
       setPasswordError(false);
@@ -86,7 +87,7 @@ export default function SignUp() {
 
     if (!name.value || name.value.length < 1) {
       setNameError(true);
-      setNameErrorMessage("Name is required.");
+      setNameErrorMessage("이름은 필수 항목입니다.");
       isValid = false;
     } else {
       setNameError(false);
@@ -95,7 +96,7 @@ export default function SignUp() {
 
     if (!tel.value || !/^\d{3}-\d{3,4}-\d{4}$/.test(tel.value)) {
       setTelError(true);
-      setTelErrorMessage("Please enter a valid phone number (XXX-XXXX-XXXX).");
+      setTelErrorMessage("올바른 전화번호를 입력하세요 (XXX-XXXX-XXXX).");
       isValid = false;
     } else {
       setTelError(false);
@@ -104,7 +105,7 @@ export default function SignUp() {
 
     if (!age.value || isNaN(age.value) || age.value <= 0) {
       setAgeError(true);
-      setAgeErrorMessage("Please enter a valid age.");
+      setAgeErrorMessage("유효한 나이를 입력하세요.");
       isValid = false;
     } else {
       setAgeError(false);
@@ -112,7 +113,7 @@ export default function SignUp() {
     }
 
     if (gender === null) {
-      alert("Please select a gender.");
+      alert("성별을 선택해주세요.");
       isValid = false;
     }
 
@@ -178,7 +179,7 @@ export default function SignUp() {
             variant="h4"
             sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
           >
-            Sign up
+            회원가입
           </Typography>
           <Box
             component="form"
@@ -201,7 +202,7 @@ export default function SignUp() {
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="password">Password</FormLabel>
+              <FormLabel htmlFor="password">비밀번호</FormLabel>
               <TextField
                 required
                 fullWidth
@@ -244,7 +245,7 @@ export default function SignUp() {
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="gender">Gender</FormLabel>
+              <FormLabel htmlFor="gender">성별</FormLabel>
               <RadioGroup
                 aria-labelledby="gender-radio-buttons-group"
                 name="gender"
@@ -254,17 +255,17 @@ export default function SignUp() {
                 <FormControlLabel
                   value="Male"
                   control={<Radio />}
-                  label="Male"
+                  label="남성"
                 />
                 <FormControlLabel
                   value="Female"
                   control={<Radio />}
-                  label="Female"
+                  label="여성"
                 />
               </RadioGroup>
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="age">Age</FormLabel>
+              <FormLabel htmlFor="age">나이</FormLabel>
               <TextField
                 required
                 fullWidth
@@ -285,28 +286,28 @@ export default function SignUp() {
               회원 가입
             </Button>
             <Typography sx={{ textAlign: "center" }}>
-              Already have an account?{" "}
+              이미 계정이 있으신가요?{" "}
               <span>
                 <RouterLink
                   to="/signin"
                   style={{ textDecoration: "none", color: "inherit" }} // 스타일 적용
                 >
-                  Sign in
+                  로그인
                 </RouterLink>
               </span>
             </Typography>
           </Box>
           <Divider>
-            <Typography sx={{ color: "text.secondary" }}>or</Typography>
+            <Typography sx={{ color: "text.secondary" }}>또는</Typography>
           </Divider>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <Button
               fullWidth
               variant="outlined"
-              onClick={() => alert("Sign up with Google")}
+              onClick={() => alert("Google로 회원가입")}
               startIcon={<GoogleIcon />}
             >
-              Sign up with Google
+              Google로 회원가입
             </Button>
           </Box>
         </Card>
