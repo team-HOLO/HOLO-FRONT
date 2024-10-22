@@ -197,7 +197,7 @@ const ProductList = () => {
                                     <CardContent>
                                         <Typography variant="h6">{product.name}</Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                            {product.price} 원
+                                        {product.price.toLocaleString()} 원
                                         </Typography>
                                     </CardContent>
                                 </CardActionArea>

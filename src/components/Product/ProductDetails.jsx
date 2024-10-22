@@ -227,7 +227,7 @@ const handleOrder = async () => {
                                     {name}
                                 </Typography>
                                 <Typography variant="h5" color="textSecondary" gutterBottom sx={{ marginBottom: '20px' }}>
-                                    판매가: {price} 원
+                                    판매가: {price.toLocaleString()} 원
                                 </Typography>
                                 <Divider sx={{ width: '100%', marginBottom: '10px', marginTop: '10px' }} />
                                 <Typography variant="body1" sx={{ marginBottom: '70px' }}>
