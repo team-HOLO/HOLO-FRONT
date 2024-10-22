@@ -64,7 +64,6 @@ const handleAddToCart = async () => {
             price: product.price, // 상품 가격 추가
             image: product.image // 상품 이미지 URL 추가
         };
-<<<<<<< HEAD
 
         // 로컬 스토리지에서 현재 장바구니 가져오기
         const currentCart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -75,28 +74,6 @@ const handleAddToCart = async () => {
             existingProduct.quantity += quantity; // 수량 증가
         } else {
             currentCart.push({ ...data }); // 새 상품 추가
-=======
-    
-        try {
-            const response = await axios.post(
-                '/api/cart', 
-                data, 
-                
-                {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-            console.log('장바구니에 추가되었습니다:', response.data);
-        } catch (error) {
-            if (error.response && (error.response.status === 403 || error.response.status === 401)) {
-                if (window.confirm('로그인 후 이용가능합니다. 로그인 페이지로 이동하시겠습니까?')) {
-                    navigate('/signIn'); // React Router를 사용하여 로그인 페이지로 이동
-                }
-            } else {
-                setError('장바구니 담기 중 오류 발생');
-            }
->>>>>>> 88dd29fe4f8fe974cf4df9b4768eca97c0ff1569
         }
 
         // 로컬 스토리지에 저장
