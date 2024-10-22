@@ -27,7 +27,7 @@ const OrderPage = () => {
       // 초기 주문 항목 설정 및 로컬스토리지에서 가져오기
         useEffect(() => {
             // 장바구니에서 선택된 상품이 있는 경우 처리
-            const storedOrder = location.state?.selectedItemsForOrder
+            const storedOrder = location.state?.selectedProducts
                 // 상품 페이지에서 개별 상품 구매
                 || (location.state?.productId
                     ? [{
