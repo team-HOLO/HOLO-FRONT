@@ -1,262 +1,198 @@
-import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Typography,
-  Checkbox,
-  IconButton,
-  Grid,
-  Card,
-  CardContent,
-  Button,
-  Box,
-  Paper,
-} from "@mui/material";
-import { Add, Remove, Delete } from "@mui/icons-material";
+import React, { useEffect, useState } from 'react';
+import { Box, Typography, Button, Card, CardContent, Grid, Checkbox, IconButton, Paper, Divider } from '@mui/material';
+import { Add, Remove, Delete } from '@mui/icons-material';
+import axios from 'axios';
 
-const App = () => {
-  const [cart, setCart] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [checkedItems, setCheckedItems] = useState([]);
-  const [selectAll, setSelectAll] = useState(false);
+const Cart = () => {
+    const [cartItems, setCartItems] = useState([]);
+    const [productDetails, setProductDetails] = useState({});
+    const [selectedItems, setSelectedItems] = useState(new Set());
+    const filePath = 'https://holo-bucket.s3.ap-northeast-2.amazonaws.com/';
+    const shippingFee = 2500; // 배송비 고정
 
-  // 로컬스토리지에서 장바구니 데이터를 불러옵니다
-  useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
-    setCart(storedCart);
-    console.log("로컬 스토리지에서 가져온 장바구니:", storedCart);
+    useEffect(() => {
+        const fetchCart = () => {
+            const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+            setCartItems(storedCart);
+        };
+        fetchCart();
+    }, []);
 
-    // 예시 상품 데이터 로드 (실제로는 API에서 받아올 수 있습니다)
-    const storedProducts = [
-      { id: 1, name: "의자", price: 10000, image: "image1_url" },
-      { id: 2, name: "소파", price: 20000, image: "image2_url" },
-      { id: 3, name: "탁자", price: 30000, image: "image3_url" },
-    ];
-    setProducts(storedProducts);
-  }, []);
+    useEffect(() => {
+        const fetchProductDetails = async () => {
+            try {
+                const detailsPromises = cartItems.map(item =>
+                    axios.get(`/api/products/${item.productId}`)
+                );
+                const responses = await Promise.all(detailsPromises);
+                const details = responses.reduce((acc, response, index) => {
+                    acc[cartItems[index].productId] = response.data;
+                    return acc;
+                }, {});
+                setProductDetails(details);
+            } catch (error) {
+                console.error('상품 정보를 가져오는 중 오류 발생:', error);
+            }
+        };
 
-  // 장바구니에 상품 추가 및 수량 조정
-  const handleAddToCart = (product) => {
-    setCart((prevCart) => {
-      const existingItem = prevCart.find(item => item.productId === product.id);
-      let updatedCart;
-      if (existingItem) {
-        updatedCart = prevCart.map(item =>
-          item.productId === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      } else {
-        updatedCart = [...prevCart, { productId: product.id, quantity: 1 }];
-      }
-      localStorage.setItem("cart", JSON.stringify(updatedCart)); // 로컬 스토리지 업데이트
-      return updatedCart;
-    });
-  };
+        if (cartItems.length > 0) {
+            fetchProductDetails();
+        }
+    }, [cartItems]);
 
-  const handleRemoveFromCart = (itemId) => {
-    setCart((prevCart) => {
-      const updatedCart = prevCart.filter(item => item.productId !== itemId);
-      localStorage.setItem("cart", JSON.stringify(updatedCart)); // 로컬 스토리지 업데이트
-      return updatedCart;
-    });
-  };
+    const updateLocalStorage = (updatedCart) => {
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+    };
 
-  // 수량 변경 함수
-  const handleQuantityChange = (id, amount) => {
-    setCart((prevCart) => {
-      const updatedCart = prevCart.map((item) =>
-        item.productId === id
-          ? { ...item, quantity: Math.max(1, item.quantity + amount) }
-          : item
-      );
-      localStorage.setItem("cart", JSON.stringify(updatedCart)); // 로컬 스토리지 업데이트
-      return updatedCart;
-    });
-  };
+    const handleRemoveFromCart = (productId, color, size) => {
+        const updatedCart = cartItems.filter(item => !(item.productId === productId && item.color === color && item.size === size));
+        setCartItems(updatedCart);
+        updateLocalStorage(updatedCart);
+    };
 
-  // 아이템 삭제 함수
-  const handleDelete = (id) => {
-    handleRemoveFromCart(id);
-  };
+    const handleQuantityChange = (productId, amount) => {
+        setCartItems((prevItems) => {
+            const updatedItems = prevItems.map((item) =>
+                item.productId === productId
+                    ? { ...item, quantity: Math.max(1, item.quantity + amount) }
+                    : item
+            );
+            updateLocalStorage(updatedItems);
+            return updatedItems;
+        });
+    };
 
-  // 체크된 아이템 삭제
-  const handleDeleteChecked = () => {
-    setCart((prevCart) => {
-      const updatedCart = prevCart.filter((item) => !checkedItems.includes(item.productId));
-      localStorage.setItem("cart", JSON.stringify(updatedCart)); // 로컬 스토리지 업데이트
-      return updatedCart;
-    });
-    setCheckedItems([]); // 체크된 아이템 초기화
-  };
+    const handleSelectItem = (productId) => {
+        setSelectedItems(prev => {
+            const updated = new Set(prev);
+            if (updated.has(productId)) {
+                updated.delete(productId);
+            } else {
+                updated.add(productId);
+            }
+            return updated;
+        });
+    };
 
-  // 전체 아이템 선택/해제
-  const handleSelectAll = () => {
-    if (selectAll) {
-      setCheckedItems([]);
-    } else {
-      setCheckedItems(cart.map((item) => item.productId));
-    }
-    setSelectAll(!selectAll);
-  };
+    const handleDeleteSelectedItems = () => {
+        const updatedCart = cartItems.filter(item => !selectedItems.has(item.productId));
+        setCartItems(updatedCart);
+        setSelectedItems(new Set());
+        updateLocalStorage(updatedCart);
+    };
 
-  const handleCheckboxChange = (id) => {
-    setCheckedItems((prevChecked) =>
-      prevChecked.includes(id)
-        ? prevChecked.filter((itemId) => itemId !== id)
-        : [...prevChecked, id]
-    );
-  };
+    const handleDeleteAllItems = () => {
+        setCartItems([]);
+        setSelectedItems(new Set());
+        localStorage.removeItem('cart');
+    };
 
-  // 상품 정보를 가져오는 함수
-  const getProductById = (id) => {
-    return products.find((product) => product.id === id);
-  };
+    // 총 상품 가격 계산
+    const totalPrice = cartItems.reduce((total, item) => {
+        const product = productDetails[item.productId];
+        return product ? total + product.price * item.quantity : total;
+    }, 0);
 
-  // 총 결제 금액 계산
-  const totalPrice = cart.reduce((total, item) => {
-    const product = getProductById(item.productId);
-    return total + (product ? product.price : 0) * item.quantity;
-  }, 0);
+    // 총 수량 계산
+    const totalQuantity = cartItems.reduce((total, item) => total + item.quantity, 0);
 
-  const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
-  const shippingFee = 3000; // 배송비 설정
-
-  return (
-    <Container>
-      <Box display="flex" justifyContent="space-between">
-        <Box width="65%">
-          <Typography variant="h4" gutterBottom>
-            장바구니
-          </Typography>
-
-          <Box>
-            <Checkbox checked={selectAll} onChange={handleSelectAll} />
-            <Typography variant="body1" display="inline">
-              전체 선택
-            </Typography>
-          </Box>
-
-          <Grid container spacing={2}>
-            {cart.map((item) => {
-              const product = getProductById(item.productId);
-              return (
-                <Grid item xs={12} key={item.productId}>
-                  <Card>
-                    <CardContent>
-                      <Grid container alignItems="center">
-                        <Grid item xs={1}>
-                          <Checkbox
-                            checked={checkedItems.includes(item.productId)}
-                            onChange={() => handleCheckboxChange(item.productId)}
-                          />
-                        </Grid>
-                        <Grid item xs={2}>
-                          {product ? (
-                            <img
-                              src={product.image}
-                              alt={product.name}
-                              style={{ width: "50px", height: "50px" }}
-                            />
-                          ) : (
-                            <Typography>상품 정보 없음</Typography>
-                          )}
-                        </Grid>
-                        <Grid item xs={3}>
-                          <Typography>{product ? product.name : "상품 정보 없음"}</Typography>
-                        </Grid>
-                        <Grid item xs={3}>
-                          <Typography>
-                            {product ? `${product.price.toLocaleString()}원 x ${item.quantity}` : "가격 정보 없음"}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={2}>
-                          <IconButton
-                            onClick={() => handleQuantityChange(item.productId, -1)}
-                          >
-                            <Remove />
-                          </IconButton>
-                          <Typography>{item.quantity}</Typography>
-                          <IconButton
-                            onClick={() => handleQuantityChange(item.productId, 1)}
-                          >
-                            <Add />
-                          </IconButton>
-                        </Grid>
-                        <Grid item xs={1}>
-                          <IconButton onClick={() => handleDelete(item.productId)}>
-                            <Delete />
-                          </IconButton>
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
+    return (
+        <Box sx={{ padding: 9 }}>
+            <Typography variant="h4" gutterBottom>장바구니</Typography>
+            <Grid container spacing={2}>
+                <Grid item xs={8}>
+                    {cartItems.length === 0 ? (
+                        <Typography variant="h6">장바구니가 비어 있습니다.</Typography>
+                    ) : (
+                        <>
+                            <Box display="flex" alignItems="center" mb={2}>
+                                <Checkbox onChange={(e) => {
+                                    if (e.target.checked) {
+                                        setSelectedItems(new Set(cartItems.map(item => item.productId)));
+                                    } else {
+                                        setSelectedItems(new Set());
+                                    }
+                                }} />
+                                <Typography>전체 선택</Typography>
+                            </Box>
+                            {cartItems.map((item, index) => (
+                                <Card key={index} sx={{ marginBottom: 2, padding: '10px' }}>
+                                    <CardContent>
+                                        <Grid container alignItems="center" spacing={2}>
+                                            <Grid item xs={1}>
+                                                <Checkbox 
+                                                    checked={selectedItems.has(item.productId)}
+                                                    onChange={() => handleSelectItem(item.productId)} 
+                                                />
+                                            </Grid>
+                                            <Grid item xs={2}>
+                                                {productDetails[item.productId] && (
+                                                    <img
+                                                        src={`${filePath}${productDetails[item.productId].productImageDtos[0].storeName}`}
+                                                        alt={productDetails[item.productId].name}
+                                                        style={{ width: '70px', height: '70px', objectFit: 'cover', marginRight: '10px' }}
+                                                    />
+                                                )}
+                                            </Grid>
+                                            <Grid item xs={3}>
+                                                <Typography variant="h6">
+                                                    {productDetails[item.productId]?.name}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={2}>
+                                                <Typography>
+                                                    {productDetails[item.productId]
+                                                        ? `${productDetails[item.productId].price.toLocaleString()}원 × ${item.quantity}`
+                                                        : '가격 정보 없음'}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={2}>
+                                                <IconButton onClick={() => handleQuantityChange(item.productId, -1)}>
+                                                    <Remove />
+                                                </IconButton>
+                                                <Typography display="inline">{item.quantity}</Typography>
+                                                <IconButton onClick={() => handleQuantityChange(item.productId, 1)}>
+                                                    <Add />
+                                                </IconButton>
+                                            </Grid>
+                                            <Grid item xs={2}>
+                                                <IconButton onClick={() => handleRemoveFromCart(item.productId, item.color, item.size)}>
+                                                    <Delete />
+                                                </IconButton>
+                                            </Grid>
+                                        </Grid>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                            <Button variant="contained" color="primary" onClick={handleDeleteSelectedItems} sx={{ mt: 2 }}>
+                                선택한 상품 삭제
+                            </Button>
+                            <Button variant="contained" color="primary" onClick={handleDeleteAllItems} sx={{ mt: 2, marginLeft: '10px' }}>
+                                전체 상품 삭제
+                            </Button>
+                        </>
+                    )}
                 </Grid>
-              );
-            })}
-          </Grid>
-
-          <Button variant="contained" onClick={handleDeleteChecked}>
-            선택된 항목 삭제
-          </Button>
-          <Button variant="contained" color="secondary" onClick={() => {
-            setCart([]);
-            localStorage.setItem("cart", JSON.stringify([])); // 로컬 스토리지도 빈 배열로 업데이트
-          }}>
-            전체 삭제
-          </Button>
+                <Grid item xs={3}>
+                    <Paper sx={{ padding: '20px' }}>
+                        <Typography variant="h5" gutterBottom>결제 정보</Typography>
+                        <Divider sx={{ marginY: 1 }} /> {/* Divider 추가 */}
+                        <Typography variant="h6">상품수: {totalQuantity}개</Typography>
+                        <Typography variant="h6">상품 금액: {totalPrice.toLocaleString()}원</Typography>
+                        <Typography variant="h6">배송비: {shippingFee.toLocaleString()}원</Typography>
+                        <Divider sx={{ marginY: 1 }} /> {/* Divider 추가 */}
+                        <Typography variant="h5" sx={{ marginTop: '10px' }}>
+                            총 결제 금액: {(totalPrice + shippingFee).toLocaleString()}원
+                        </Typography>
+                        <Button variant="contained" color="primary" fullWidth sx={{ marginTop: '20px' }}>
+                            구매하기
+                        </Button>
+                    </Paper>
+                </Grid>
+            </Grid>
         </Box>
-
-        {/* 결제 정보 */}
-        <Box width="30%">
-          <Paper elevation={3} style={{ padding: "16px" }}>
-            <Typography variant="h6" gutterBottom>
-              결제 정보
-            </Typography>
-            <Typography>상품 수: {totalItems}개</Typography>
-            <Typography>상품 금액: {totalPrice.toLocaleString()}원</Typography>
-            <Typography>배송비: {shippingFee.toLocaleString()}원</Typography>
-            <Typography>
-              총 결제 금액: {(totalPrice + shippingFee).toLocaleString()}원
-            </Typography>
-
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
-              style={{ marginTop: "16px" }}
-            >
-              구매하기
-            </Button>
-          </Paper>
-        </Box>
-      </Box>
-
-      {/* 상품 리스트 */}
-      <Typography variant="h4" gutterBottom style={{ marginTop: '20px' }}>
-        상품 목록
-      </Typography>
-      <Grid container spacing={2}>
-        {products.map((product) => (
-          <Grid item xs={12} sm={6} md={4} key={product.id}>
-            <Card>
-              <CardContent>
-                <img src={product.image} alt={product.name} style={{ width: "100%" }} />
-                <Typography variant="h6">{product.name}</Typography>
-                <Typography variant="body1">{product.price.toLocaleString()}원</Typography>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => handleAddToCart(product)}
-                >
-                  장바구니에 담기
-                </Button>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    </Container>
-  );
+    );
 };
 
-export default App;
+export default Cart;
+

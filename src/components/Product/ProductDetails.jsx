@@ -49,25 +49,26 @@ const handleAddToCart = async () => {
     }
     setOptionError(''); // 오류 메시지 초기화
 
-    const data = {
-        productId,
-        quantity,
-        color,
-        size,
-        name: product.name, // 상품 이름 추가
-        price: product.price, // 상품 가격 추가
-        image: product.image, // 상품 이미지 추가
-    };
-
     try {
+        // 현재 상품 정보를 가져오기 (예: API 호출 또는 상태에서)
+        const productData = await axios.get(`/api/products/${productId}`); // 상품 정보 가져오기
+        const product = productData.data;
+
+        const data = {
+            productId,
+            quantity,
+            color,
+            size,
+            name: product.name, // 상품 이름 추가
+            price: product.price, // 상품 가격 추가
+            image: product.image // 상품 이미지 URL 추가
+        };
+
         // 로컬 스토리지에서 현재 장바구니 가져오기
         const currentCart = JSON.parse(localStorage.getItem('cart')) || [];
 
         // 장바구니에 상품 추가
-        const existingProduct = currentCart.find(item => 
-            item.productId === productId && item.color === color && item.size === size
-        );
-        
+        const existingProduct = currentCart.find(item => item.productId === productId && item.color === color && item.size === size);
         if (existingProduct) {
             existingProduct.quantity += quantity; // 수량 증가
         } else {
@@ -82,7 +83,7 @@ const handleAddToCart = async () => {
     } catch (error) {
         console.error('장바구니 추가 중 오류 발생:', error);
     }
-};
+}
 
     
     // const handleAddToCart = async () => {
