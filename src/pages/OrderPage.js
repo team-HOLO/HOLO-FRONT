@@ -87,8 +87,10 @@ const OrderPage = () => {
 
             console.log('주문 성공:', response.data);
 
+             if (!location.state?.productId){
             // 주문 후 로컬스토리지 비우기
             localStorage.removeItem('cart');
+            }
             //총가격 계산
             const totalAmount = productDetails.reduce((total, product, index) => {
                 const itemPrice = product.price * orderItems[index].quantity;
