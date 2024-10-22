@@ -18,7 +18,9 @@ const apiUrl = process.env.REACT_APP_API_URL;
 
     const fetchOrders = async () => {
         try {
-            const response = await axios.get('${apiUrl}/api/admin/orders');  // API 호출
+            const response = await axios.get(`${apiUrl}/api/admin/orders`,{  // API 호출
+            withCredentials: true,
+            });
             setOrders(response.data);  // 불러온 주문 목록을 상태에 저장
         } catch (error) {
             console.error('주문 목록을 불러오는 데 실패했습니다:', error);
@@ -28,7 +30,9 @@ const apiUrl = process.env.REACT_APP_API_URL;
     // 주문 취소
     const cancelOrder = async (orderId) => {
         try {
-            await axios.delete(`${apiUrl}/api/orders/${orderId}`);  // 취소 API 호출
+            await axios.delete(`${apiUrl}/api/orders/${orderId}`,{
+            withCredentials: true,
+            });  // 취소 API 호출
             fetchOrders();  // 취소 후 주문 목록 갱신
         } catch (error) {
             console.error('주문 취소에 실패했습니다:', error);
@@ -38,7 +42,8 @@ const apiUrl = process.env.REACT_APP_API_URL;
     // 주문 상태 변경
     const updateOrderStatus = async (orderId, newStatus) => {
         try {
-            await axios.put(`${apiUrl}/api/admin/orders/${orderId}/status`, { newStatus });  // 상태 변경 API 호출
+            await axios.put(`${apiUrl}/api/admin/orders/${orderId}/status`,
+             { newStatus },{ withCredentials: true, } );  // 상태 변경 API 호출
             fetchOrders();  // 상태 변경 후 주문 목록 갱신
         } catch (error) {
             console.error('주문 상태 변경에 실패했습니다:', error);

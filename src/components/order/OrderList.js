@@ -1,9 +1,8 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableHead, TableRow, Collapse, Box, Button } from '@mui/material';
+import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import OrderItem from './OrderItem';  // OrderItem 컴포넌트 불러오기
 
-
-const OrderList = ({ orders = [], onCancelOrder, onUpdateStatus, onToggleOrder, openOrders }) => { // 추가된 props
+const OrderList = ({ orders = [], onCancelOrder, onUpdateStatus }) => { // 기본값 설정
     return (
         <Table>
             <TableHead>
@@ -16,30 +15,14 @@ const OrderList = ({ orders = [], onCancelOrder, onUpdateStatus, onToggleOrder, 
                 </TableRow>
             </TableHead>
             <TableBody>
-                {orders.length > 0 ? (
+                {orders.length > 0 ? ( // orders가 비어있지 않은 경우
                     orders.map(order => (
-                        <React.Fragment key={order.orderId}>
-                            <OrderItem
-                                order={order}
-                                onCancelOrder={onCancelOrder}
-                                onUpdateStatus={onUpdateStatus}
-                                onToggleOrder={onToggleOrder} // 클릭 핸들러 추가
-                                open={openOrders[order.orderId]} // 열림 상태 추가
-                            />
-
-                            <Collapse in={openOrders[order.orderId]} timeout="auto" unmountOnExit>
-                                <Box sx={{ pl: 2 }}>
-                                    <p>주문 날짜: {order.orderDate}</p>
-                                    <p>배송지: {order.shippingAddress}</p>
-                                    <p>구매한 제품:</p>
-                                    <ul>
-                                        {order.orderProducts.map(product => (
-                                            <li key={product.id}>{product.name} - {product.price}원</li>
-                                        ))}
-                                    </ul>
-                                </Box>
-                            </Collapse>
-                        </React.Fragment>
+                        <OrderItem
+                            key={order.orderId}
+                            order={order}
+                            onCancelOrder={onCancelOrder}
+                            onUpdateStatus={onUpdateStatus}
+                        />
                     ))
                 ) : (
                     <TableRow>
