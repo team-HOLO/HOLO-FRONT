@@ -118,41 +118,57 @@ const handleAddToCart = async () => {
     // };
 
     //바로 주문 
-    const handleOrder = async () => {
+const handleOrder = async () => {
+    if (!color || !size) {
+        setOptionError('옵션을 선택해주세요');
+        return;
+    }
+    setOptionError(''); // 오류 메시지 초기화
 
-        if (!color || !size) {
-            setOptionError('옵션을 선택해주세요');
-            return;
-        }
-        setOptionError(''); // 오류 메시지 초기화
-
-        const data = {
-            productId,
-            quantity,
-            color,
-            size,
-        };
-    
-        try {
-            const response = await axios.post('/api/orders', data, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            console.log('주문이 완료되었습니다.', response.data);
-        } catch (error) {
-            if (error.response && (error.response.status === 403 || error.response.status === 401)) {
-                if (window.confirm('로그인 후 이용가능합니다. 로그인 페이지로 이동하시겠습니까?')) {
-                    navigate('/login'); 
-                }
-            } else {
-                setError('장바구니 담기 중 오류 발생');
-            }
-        }
+    // 주문 요청 데이터 구조에 맞춰 수정
+    const data = {
+        products: [
+            {
+                productId: productId,
+                quantity: quantity,
+                color: color,
+                size: size,
+            },
+        ],
+        shippingAddress: '', // 빈 문자열로 초기화 (나중에 order 페이지에서 입력)
+        recipientName: '',   // 빈 문자열로 초기화
+        shippingRequest: '',  // 빈 문자열로 초기화
     };
 
+    try {
+        const response = await axios.post('/api/orders', data, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
 
+        // 성공적으로 주문 후 order 페이지로 이동
+        navigate('/order', {
+            state: {
+                // 필요한 경우 추가 데이터 전달
+                productId,
+                quantity,
+                color,
+                size,
+            },
+        });
+
+        console.log('주문이 완료되었습니다.', response.data);
+    } catch (error) {
+        if (error.response && (error.response.status === 403 || error.response.status === 401)) {
+            if (window.confirm('로그인 후 이용가능합니다. 로그인 페이지로 이동하시겠습니까?')) {
+                navigate('/login');
+            }
+        } else {
+            setError('장바구니 담기 중 오류 발생');
+        }
+    }
+};
 
     if (!product) return <div>Loading...</div>;
 
