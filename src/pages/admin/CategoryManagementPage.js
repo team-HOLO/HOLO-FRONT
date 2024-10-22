@@ -74,16 +74,6 @@ const CategoryManagementPage = ({ refreshCategories }) => {
     setSortOption(event.target.value);
   };
 
-  const handleFormSubmit = async (newCategory) => {
-    try {
-      await axios.post(`${apiUrl}/api/categories`, { newCategory }, { withCredentials: true });
-      await fetchCategories(); // 새 카테고리 목록을 먼저 가져옴
-      handleFormClose();
-    } catch (error) {
-      console.error('Error adding category:', error);
-    }
-  };
-
   const handleEdit = async (category) => {
     try {
       const response = await axios.get(
@@ -123,7 +113,7 @@ const CategoryManagementPage = ({ refreshCategories }) => {
           카테고리 추가
         </Button>
       </Box>
-      <CategoryForm open={formOpen} category={selectedCategory} fetchCategories={fetchCategories} onClose={handleFormClose} onSubmit={handleFormSubmit} />
+      <CategoryForm open={formOpen} category={selectedCategory} fetchCategories={fetchCategories} onClose={handleFormClose}/>
       <TextField
         label="검색"
         value={searchTerm}
