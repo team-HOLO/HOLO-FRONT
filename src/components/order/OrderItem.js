@@ -1,6 +1,5 @@
 import React from 'react';
 import { TableRow, TableCell, IconButton } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import OrderStatusUpdate from './OrderStatusUpdate';
 

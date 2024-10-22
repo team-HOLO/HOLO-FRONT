@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Box, Typography, TextField, Button, Checkbox } from '@mui/material';
+import { Box, Typography, TextField, Button} from '@mui/material';
+
+const apiUrl = process.env.REACT_APP_API_URL;
 
 const OrderPage = () => {
     const location = useLocation();
@@ -16,29 +18,34 @@ const OrderPage = () => {
     const [recipientName, setRecipientName] = useState('');
     const [shippingRequest, setShippingRequest] = useState('');
     const [orderError, setOrderError] = useState('');
-
-    const [selectedItems, setSelectedItems] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
 
     const filePath = 'https://holo-bucket.s3.ap-northeast-2.amazonaws.com/';
     const itemsPerPage = 3;
     const shippingFee = 2500;
 
-    // 초기 주문 항목 설정 및 로컬스토리지에서 가져오기
-    useEffect(() => {
-        const storedOrder = location.state?.productId
-            ? [{ productId: location.state.productId, quantity: location.state.quantity, color: location.state.color, size: location.state.size }]
-            : JSON.parse(localStorage.getItem('cart')) || [];
+      // 초기 주문 항목 설정 및 로컬스토리지에서 가져오기
+        useEffect(() => {
+            // 장바구니에서 선택된 상품이 있는 경우 처리
+            const storedOrder = location.state?.selectedItemsForOrder
+                // 상품 페이지에서 개별 상품 구매
+                || (location.state?.productId
+                    ? [{
+                        productId: location.state.productId,
+                        quantity: location.state.quantity,
+                        color: location.state.color,
+                        size: location.state.size
+                    }]
+                    : JSON.parse(localStorage.getItem('cart')) || []);
 
-        setOrderItems(storedOrder);
-    }, [location.state]);
-
+            setOrderItems(storedOrder);
+        }, [location.state]);
     // 주문 상품 상세 정보 가져오기
     useEffect(() => {
         const fetchProductDetails = async () => {
             try {
                 const productDetailsPromises = orderItems.map(item =>
-                    axios.get(`/api/products/${item.productId}`)
+                    axios.get(`${apiUrl}/api/products/${item.productId}`)
                 );
                 const responses = await Promise.all(productDetailsPromises);
                 setProductDetails(responses.map(response => response.data));
@@ -49,25 +56,7 @@ const OrderPage = () => {
 
         if (orderItems.length > 0) fetchProductDetails();
     }, [orderItems]);
-
-    // 선택된 상품 처리
-    const handleSelectItem = (productId) => {
-        setSelectedItems(prevSelected =>
-            prevSelected.includes(productId)
-                ? prevSelected.filter(id => id !== productId)
-                : [...prevSelected, productId]
-        );
-    };
-
-    // 선택된 상품 제거
-    const handleRemoveSelectedItems = () => {
-        const updatedOrderItems = orderItems.filter(item => !selectedItems.includes(item.productId));
-        setOrderItems(updatedOrderItems);
-        localStorage.setItem('cart', JSON.stringify(updatedOrderItems));
-        setSelectedItems([]);
-    };
-
-    // 주문 처리
+   // 주문 처리
     const handleOrder = async () => {
         setOrderError(''); // 초기화
         if (!shippingAddress || !recipientName) {
@@ -75,7 +64,7 @@ const OrderPage = () => {
             return;
         }
 
-        // OrderRequestDto에 맞게 데이터 구조 조정
+        // OrderRequestDto에
         const data = {
             products: orderItems.map(item => ({
                 productId: item.productId,
@@ -89,9 +78,15 @@ const OrderPage = () => {
         };
 
         try {
-            const response = await axios.post('/api/orders', data, {
-                headers: { 'Content-Type': 'application/json' },
+            const response = await axios.post
+            (`${apiUrl}/api/orders`, data, {
+                headers: { 'Content-Type': 'application/json'
+                },
+            withCredentials: true,   // 쿠키에 저장된 JWT를 자동으로 전송
             });
+
+            console.log('주문 성공:', response.data);
+
             // 주문 후 로컬스토리지 비우기
             localStorage.removeItem('cart');
             //총가격 계산
@@ -144,14 +139,6 @@ const OrderPage = () => {
                 <Box sx={{ flex: 1, mr: 2 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                         <Typography variant="h5">상품 정보</Typography>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={handleRemoveSelectedItems}
-                            disabled={selectedItems.length === 0}
-                        >
-                            선택된 상품 제거
-                        </Button>
                     </Box>
 
                     {productDetails.length === 0 ? (
@@ -160,10 +147,6 @@ const OrderPage = () => {
                         currentProducts.map((product, index) => (
                             <Box key={index} sx={{ p: 2, border: '1px solid #ddd', borderRadius: '8px', mb: 2 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <Checkbox
-                                        checked={selectedItems.includes(product.productId)}
-                                        onChange={() => handleSelectItem(product.productId)}
-                                    />
                                     <img
                                         src={`${filePath}${product.productImageDtos[0]?.storeName}`}
                                         alt={product.name}
@@ -202,7 +185,7 @@ const OrderPage = () => {
                     )}
                 </Box>
 
-                {/* 사용자 정보 및 주문 섹션 */}
+
                 <Box sx={{ flex: 1, mt: 10 }}>
                     <Box sx={{ mb: 10 }}>
                         <Box sx={{ p: 2, border: '1px solid #ddd', borderRadius: '8px' }}>

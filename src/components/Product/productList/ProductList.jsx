@@ -3,7 +3,6 @@ import { Box, Typography, Grid, Card, CardActionArea, Tooltip, CardContent, Card
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Header from 'components/Header';
-import { useNavigate } from 'react-router-dom';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
 const filePath = 'https://holo-bucket.s3.ap-northeast-2.amazonaws.com/'
@@ -63,7 +62,6 @@ const ProductList = () => {
     const handleSearch = () => {
         setPage(1);
         fetchProducts();
-        setProductSearchCond("");
     };
 
     // 페이지 크기 변경 핸들러
@@ -199,7 +197,7 @@ const ProductList = () => {
                                     <CardContent>
                                         <Typography variant="h6">{product.name}</Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                            {product.price} 원
+                                        {product.price.toLocaleString()} 원
                                         </Typography>
                                     </CardContent>
                                 </CardActionArea>
