@@ -98,7 +98,7 @@ const OrderPage = () => {
         };
 
         try {
-            const response = await axios.post(`${apiUrl}/api/orders', data, {
+            const response = await axios.post(`${apiUrl}/api/orders`, data, {
                 headers: { 'Content-Type': 'application/json' },
             });
             // 주문 후 로컬스토리지 비우기
