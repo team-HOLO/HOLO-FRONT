@@ -169,57 +169,60 @@ const Cart = () => {
                             </Box>
 
                             {cartItems.map((item, index) => {
-                                const key = `${item.productId}-${item.color}-${item.size}`;
-                                return (
-                                    <Card key={index} sx={{ marginBottom: 2, padding: '10px' }}>
-                                        <CardContent>
-                                            <Grid container alignItems="center" spacing={2}>
-                                                <Grid item xs={1}>
-                                                    <Checkbox 
-                                                        checked={selectedItems.has(key)}
-                                                        onChange={() => handleSelectItem(item.productId, item.color, item.size)} 
-                                                    />
-                                                </Grid>
-                                                <Grid item xs={2}>
-                                                    {productDetails[item.productId] && (
-                                                        <img
-                                                            src={`${filePath}${productDetails[item.productId].productImageDtos[0].storeName}`}
-                                                            alt={productDetails[item.productId].name}
-                                                            style={{ width: '70px', height: '70px', objectFit: 'cover', marginRight: '10px' }}
-                                                        />
-                                                    )}
-                                                </Grid>
-                                                <Grid item xs={3}>
-                                                    <Typography variant="h6">
-                                                        {productDetails[item.productId]?.name}
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={2}>
-                                                    <Typography>
-                                                        {productDetails[item.productId]
-                                                            ? `${productDetails[item.productId].price.toLocaleString()}원 × ${item.quantity}`
-                                                            : '가격 정보 없음'}
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={2}>
-                                                    <IconButton onClick={() => handleQuantityChange(item.productId, item.color, item.size, -1)}>
-                                                        <Remove />
-                                                    </IconButton>
-                                                    <Typography display="inline">{item.quantity}</Typography>
-                                                    <IconButton onClick={() => handleQuantityChange(item.productId, item.color, item.size, 1)}>
-                                                        <Add />
-                                                    </IconButton>
-                                                </Grid>
-                                                <Grid item xs={2}>
-                                                    <IconButton onClick={() => handleRemoveFromCart(item.productId, item.color, item.size)}>
-                                                        <Delete />
-                                                    </IconButton>
-                                                </Grid>
-                                            </Grid>
-                                        </CardContent>
-                                    </Card>
-                                );
-                            })}
+    const key = `${item.productId}-${item.color}-${item.size}`;
+    return (
+        <Card key={index} sx={{ marginBottom: 2, padding: '10px' }}>
+            <CardContent>
+                <Grid container alignItems="center" spacing={2}>
+                    <Grid item xs={1}>
+                        <Checkbox 
+                            checked={selectedItems.has(key)}
+                            onChange={() => handleSelectItem(item.productId, item.color, item.size)} 
+                        />
+                    </Grid>
+                    <Grid item xs={2}>
+                        {productDetails[item.productId] && (
+                            <img
+                                src={`${filePath}${productDetails[item.productId].productImageDtos[0].storeName}`}
+                                alt={productDetails[item.productId].name}
+                                style={{ width: '70px', height: '70px', objectFit: 'cover', marginRight: '10px' }}
+                            />
+                        )}
+                    </Grid>
+                    <Grid item xs={3}>
+                        <Typography variant="h6">
+                            {productDetails[item.productId]?.name}
+                        </Typography>
+                        <Typography variant="body2">색상: {item.color}</Typography>
+                        <Typography variant="body2">사이즈: {item.size}</Typography>
+                    </Grid>
+                    <Grid item xs={2}>
+                        <Typography>
+                            {productDetails[item.productId]
+                                ? `${productDetails[item.productId].price.toLocaleString()}원 × ${item.quantity}`
+                                : '가격 정보 없음'}
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={2}>
+                        <IconButton onClick={() => handleQuantityChange(item.productId, item.color, item.size, -1)}>
+                            <Remove />
+                        </IconButton>
+                        <Typography display="inline">{item.quantity}</Typography>
+                        <IconButton onClick={() => handleQuantityChange(item.productId, item.color, item.size, 1)}>
+                            <Add />
+                        </IconButton>
+                    </Grid>
+                    <Grid item xs={2}>
+                        <IconButton onClick={() => handleRemoveFromCart(item.productId, item.color, item.size)}>
+                            <Delete />
+                        </IconButton>
+                    </Grid>
+                </Grid>
+            </CardContent>
+        </Card>
+    );
+})}
+
                             <Button variant="contained" color="primary" onClick={handleDeleteSelectedItems} sx={{ mt: 2 }}>
                                 선택한 상품 삭제
                             </Button>
