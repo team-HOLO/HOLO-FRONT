@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Box, Typography, TextField, Button, Checkbox } from '@mui/material';
 
+const apiUrl = process.env.REACT_APP_API_URL;
+
 const OrderPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -24,21 +26,28 @@ const OrderPage = () => {
     const itemsPerPage = 3;
     const shippingFee = 2500;
 
-    // 초기 주문 항목 설정 및 로컬스토리지에서 가져오기
-    useEffect(() => {
-        const storedOrder = location.state?.productId
-            ? [{ productId: location.state.productId, quantity: location.state.quantity, color: location.state.color, size: location.state.size }]
-            : JSON.parse(localStorage.getItem('cart')) || [];
+      // 초기 주문 항목 설정 및 로컬스토리지에서 가져오기
+        useEffect(() => {
+            // 장바구니에서 선택된 상품이 있는 경우 처리
+            const storedOrder = location.state?.selectedItemsForOrder
+                // 상품 페이지에서 개별 상품 구매
+                || (location.state?.productId
+                    ? [{
+                        productId: location.state.productId,
+                        quantity: location.state.quantity,
+                        color: location.state.color,
+                        size: location.state.size
+                    }]
+                    : JSON.parse(localStorage.getItem('cart')) || []);
 
-        setOrderItems(storedOrder);
-    }, [location.state]);
-
+            setOrderItems(storedOrder);
+        }, [location.state]);
     // 주문 상품 상세 정보 가져오기
     useEffect(() => {
         const fetchProductDetails = async () => {
             try {
                 const productDetailsPromises = orderItems.map(item =>
-                    axios.get(`/api/products/${item.productId}`)
+                    axios.get(`${apiUrl}/api/products/${item.productId}`)
                 );
                 const responses = await Promise.all(productDetailsPromises);
                 setProductDetails(responses.map(response => response.data));
@@ -89,7 +98,7 @@ const OrderPage = () => {
         };
 
         try {
-            const response = await axios.post('/api/orders', data, {
+            const response = await axios.post(`${apiUrl}/api/orders`, data, {
                 headers: { 'Content-Type': 'application/json' },
             });
             // 주문 후 로컬스토리지 비우기
