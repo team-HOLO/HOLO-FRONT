@@ -15,11 +15,12 @@ import ProductList from "./components/Product/productList/ProductList";
 import ProductDetails from "./components/Product/ProductDetails";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
-
+import OrderPage from './pages/OrderPage';
+import OrderCompletePage from './pages/OrderCompletePage';
 import MemberUpdatePage from "./pages/MemberUpdate";
-
+import OrderList from "./components/order/OrderList";
+import OrderManagementPage from "./pages/admin/OrderManagementPage";
 import MyPage from "pages/myPage/MyPage";
-
 const theme = createTheme({
   palette: {
     primary: {
@@ -68,6 +69,7 @@ function App() {
               <Route path="products" element={<ProductList />} />
               <Route path="products/:productId" element={<ProductDetails />} />
               <Route path="products/category/:categoryId" element={<ProductList />} />
+               <Route path="orders" element={<OrderList />} />
               <Route path="/mypage" element={<MyPage />} />
               <Route path="/admin" element={<AdminPage />}>
                 <Route index element={<AdminDashboard />} />
@@ -80,13 +82,17 @@ function App() {
                   }
                 />
                 <Route path="members" element={<Home />} />
-                <Route path="orders" element={<Home />} />
+                <Route path="orders" element={<OrderManagementPage />} />
                 <Route path="products" element={<ProductManagementPage />} />
               </Route>
               <Route path="/about" element={<About />} />
               <Route path="/signin" element={<SignInPage />} />
               <Route path="/signup" element={<SignUpPage />} />
               <Route path="/memberupdate" element={<MemberUpdatePage />} />
+
+
+               <Route path="/order" element={<OrderPage />} />
+               <Route path="/ordercomplete" element={<OrderCompletePage />} />
             </Routes>
           </div>
           <Footer />
