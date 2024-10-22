@@ -3,7 +3,7 @@ import { AppBar, Toolbar, Typography, Box, Button } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import CategoryMenu from "components/CategoryMenu";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-
+const apiUrl = process.env.REACT_APP_API_URL;
 function Header({ isAdmin, categories, refreshCategories }) {
   const [stateIsAdmin, setStateIsAdmin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 여부 확인 state
@@ -13,7 +13,7 @@ function Header({ isAdmin, categories, refreshCategories }) {
   useEffect(() => {
     const checkAdminStatus = async () => {
       try {
-        const response = await fetch("/api/members/check-admin", {
+        const response = await fetch(`${apiUrl}/api/members/check-admin`, {
           method: "GET",
           credentials: "include", // 쿠키 포함
         });
@@ -26,7 +26,7 @@ function Header({ isAdmin, categories, refreshCategories }) {
 
     const checkLoginStatus = async () => {
       try {
-        const response = await fetch("/api/members/check-login", {
+        const response = await fetch(`${apiUrl}/api/members/check-login`, {
           method: "GET",
           credentials: "include", // 쿠키 포함
         });
@@ -44,7 +44,7 @@ function Header({ isAdmin, categories, refreshCategories }) {
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/members/logout", {
+      await fetch(`${apiUrl}/api/members/logout`, {
         method: "POST",
         credentials: "include", // 쿠키 포함
       });
@@ -88,9 +88,17 @@ function Header({ isAdmin, categories, refreshCategories }) {
         <Box
           style={{ flexGrow: 1, display: "flex", justifyContent: "flex-end" }}
         >
-         <Link to="/cart" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
-          <AddShoppingCartIcon style={{ padding: '0 10px' }} />
-           </Link>
+          <Link
+            to="/cart"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+              color: "inherit",
+            }}
+          >
+            <AddShoppingCartIcon style={{ padding: "0 10px" }} />
+          </Link>
 
           {isLoggedIn ? (
             <>
