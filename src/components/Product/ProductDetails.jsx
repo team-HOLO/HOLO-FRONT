@@ -78,10 +78,11 @@ const handleAddToCart = async () => {
             currentCart.push({ ...data }); // 새 상품 추가
         }
 
-        // 로컬 스토리지에 저장
+        //로컬스토리지에 저장
         localStorage.setItem('cart', JSON.stringify(currentCart));
 
         console.log('장바구니에 추가되었습니다:', currentCart);
+        alert('장바구니에 추가되었습니다.'); // 장바구니 알림 추가하기
         console.log('현재 로컬 스토리지:', localStorage.getItem('cart')); // 로컬 스토리지 확인
     } catch (error) {
         console.error('장바구니 추가 중 오류 발생:', error);

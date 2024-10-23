@@ -97,7 +97,7 @@ function Header({ isAdmin, categories, refreshCategories }) {
               color: "inherit",
             }}
           >
-            <AddShoppingCartIcon style={{ padding: "0 10px" }} />
+            <AddShoppingCartIcon style={{ width: 50, padding: "0 10px" }} />
           </Link>
 
           {isLoggedIn ? (
