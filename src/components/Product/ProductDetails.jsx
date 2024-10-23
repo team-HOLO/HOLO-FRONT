@@ -100,6 +100,7 @@ const handleAddToCart = async () => {
         localStorage.setItem('cart', JSON.stringify(currentCart));
 
         console.log('장바구니에 추가되었습니다:', currentCart);
+        alert('장바구니에 추가되었습니다.'); // 알림 추가
         console.log('현재 로컬 스토리지:', localStorage.getItem('cart')); // 로컬 스토리지 확인
     } catch (error) {
         console.error('장바구니 추가 중 오류 발생:', error);
