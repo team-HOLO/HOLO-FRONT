@@ -87,10 +87,8 @@ const OrderPage = () => {
 
             console.log('주문 성공:', response.data);
 
-             if (!location.state?.productId){
             // 주문 후 로컬스토리지 비우기
             localStorage.removeItem('cart');
-            }
             //총가격 계산
             const totalAmount = productDetails.reduce((total, product, index) => {
                 const itemPrice = product.price * orderItems[index].quantity;
@@ -98,7 +96,7 @@ const OrderPage = () => {
             }, 0) + shippingFee;
 
            // 수량 정보를 productDetails와 결합
-                  const orderProductsWithQuantity = productDetails.map((product, index) => ({
+            const orderProductsWithQuantity = productDetails.map((product, index) => ({
                       ...product,
                       quantity: orderItems[index].quantity, // 수량 추가
                   }));
@@ -115,7 +113,17 @@ const OrderPage = () => {
             });
         } catch (error) {
             console.error('주문 중 오류 발생:', error);
-            setOrderError('주문 중 오류가 발생했습니다. 다시 시도해 주세요.');
+
+            if (error.response && error.response.status === 400) {
+                // 재고 부족 예외 처리
+                if (error.response.data.message || '재고가 부족합니다.') {
+                    setOrderError('주문하신 상품의 재고가 부족합니다.');
+                } else {
+                    setOrderError(error.response.data.message || '주문 중 오류가 발생했습니다.');
+                }
+            } else {
+                setOrderError('주문 중 오류가 발생했습니다.');
+            }
         }
     };
 

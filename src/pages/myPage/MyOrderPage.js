@@ -4,6 +4,7 @@ import { ExpandLess, ExpandMore, LocalShipping, Done, Clear } from '@mui/icons-m
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import OrderProductItem from 'components/myPage/OrderProductItem'; // 새로운 컴포넌트 불러오기
 import CancelOrderDialog from 'components/myPage/CancelOrderDialog'; // 모달 컴포넌트 추가
+import UpdateOrderDialog from 'components/myPage/UpdateOrderDialog';
 import axios from 'axios';
 
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -13,6 +14,13 @@ const MyOrderPage = () => {
     const [openOrders, setOpenOrders] = useState({});
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+    const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+
+    const [selectedOrderInfo, setSelectedOrderInfo] = useState({
+        shippingAddress: '',
+        recipientName: '',
+        shippingRequest: '',
+    });
 
     const fetchOrders = async () => {
         try {
@@ -34,13 +42,25 @@ const MyOrderPage = () => {
     const handleCancelOrder = async (orderId) => {
         try {
             await axios.delete(`${apiUrl}/api/orders/${orderId}`, {
-                withCredentials: true,
+                withCredentials: true
             });
             alert('주문이 취소되었습니다.');
             /*fetchOrders();*/
             // 주문 목록을 새로고침하거나 상태를 업데이트합니다.
         } catch (error) {
             alert('주문 취소에 실패했습니다.');
+        }
+    };
+
+    const handleUpdateShippingInfo = async (orderId, updateData) => {
+        try {
+            await axios.put(`${apiUrl}/api/orders/${orderId}/update`, updateData, {
+                withCredentials: true
+            });
+            alert('배송 정보가 업데이트되었습니다.');
+            fetchOrders();
+        } catch (error) {
+            alert('배송 정보 업데이트에 실패했습니다.');
         }
     };
 
@@ -56,11 +76,25 @@ const MyOrderPage = () => {
         setIsCancelDialogOpen(true);
     };
 
+    const handleOpenUpdateDialog = (order) => {
+        setSelectedOrderId(order.orderId);
+        setSelectedOrderInfo({
+            shippingAddress: order.shippingAddress,
+            recipientName: order.recipientName,
+            shippingRequest: order.shippingRequest,
+        });
+        setIsUpdateDialogOpen(true);
+    };
+
     const handleCloseCancelDialog = () => {
         setIsCancelDialogOpen(false);
         setSelectedOrderId(null);
     };
 
+    const handleCloseUpdateDialog = () => {
+        setIsUpdateDialogOpen(false);
+        setSelectedOrderId(null);
+    };
 
     const getStatusIcon = (status) => {
         switch (status) {
@@ -166,6 +200,9 @@ const MyOrderPage = () => {
                             ))}
                             {order.status === 'ORDER' && (
                                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                                    <Button variant="contained" color="primary" onClick={() => handleOpenUpdateDialog(order)}>
+                                        배송지 수정
+                                    </Button>
                                     <Button variant="contained" color="primary" onClick={() => handleOpenCancelDialog(order.orderId)}>
                                         주문 취소
                                     </Button>
@@ -180,6 +217,13 @@ const MyOrderPage = () => {
                 orderId={selectedOrderId}
                 onClose={handleCloseCancelDialog}
                 onCancel={handleCancelOrder}
+            />
+            <UpdateOrderDialog
+                open={isUpdateDialogOpen}
+                orderId={selectedOrderId}
+                orderInfo={selectedOrderInfo}
+                onClose={handleCloseUpdateDialog}
+                onUpdate={handleUpdateShippingInfo}
             />
         </List>
     );
