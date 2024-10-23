@@ -160,10 +160,9 @@ const handleOrder = async () => {
                 navigate(`/signIn?redirect=/products/${Number(productId)}`) // 사용자가 확인한 경우 로그인 페이지로 이동
             } else {
                 // 취소한 경우 추가 작업이 필요 없다면 아무 것도 하지 않음
-                window.close(); // 현재 창을 닫음 (브라우저 정책에 따라 동작하지 않을 수 있음)
+               return; //
             }
-        }
-
+        }else{
         // 성공적으로 주문 후 order 페이지로 이동
         navigate('/order', {
             state: {
@@ -174,6 +173,7 @@ const handleOrder = async () => {
                 size,
             },
         });
+      }
     } catch (error) {
         if (error.response && (error.response.status === 403 || error.response.status === 401)) {
             if (window.confirm('로그인 후 이용가능합니다. 로그인 페이지로 이동하시겠습니까?')) {
