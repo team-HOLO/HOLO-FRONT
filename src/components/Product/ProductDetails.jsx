@@ -24,7 +24,7 @@ const ProductDetails = () => {
     const { productId } = useParams() // URL에서 productId 가져오기
 
     const handleInputChange = (event) => {
-        const value = Math.max(1, Number(event.target.value)); // 최소 1로 설정
+        const value = Math.max(1, Math.min(Number(event.target.value), product.stockQuantity)); // 최소 1, 최대 stockQuantity로 설정
         setQuantity(value);
     };
 
