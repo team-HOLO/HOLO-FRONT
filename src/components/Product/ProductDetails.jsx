@@ -164,13 +164,6 @@ const handleOrder = async () => {
             }
         }
 
-        const response = await axios.post(`${apiUrl}/api/orders`, data, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            withCredentials: true,  // 쿠키에 저장된 JWT를 자동으로 전송  
-        });
-
         // 성공적으로 주문 후 order 페이지로 이동
         navigate('/order', {
             state: {
@@ -181,8 +174,6 @@ const handleOrder = async () => {
                 size,
             },
         });
-
-        console.log('주문이 완료되었습니다.', response.data);
     } catch (error) {
         if (error.response && (error.response.status === 403 || error.response.status === 401)) {
             if (window.confirm('로그인 후 이용가능합니다. 로그인 페이지로 이동하시겠습니까?')) {
