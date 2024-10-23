@@ -53,24 +53,6 @@ const handleAddToCart = async () => {
 
     try {
 
-        const loginData = await axios.get(
-            `${apiUrl}/api/members/check-login`,
-            {
-                withCredentials: true,  // 쿠키에 저장된 JWT를 자동으로 전송
-            }
-        );
-        const isLogin = loginData.data;
-    
-        if (!isLogin) {
-            const confirmed = window.confirm('로그인 후 이용 가능합니다. 로그인 페이지로 이동하시겠습니까?');
-            if (confirmed) {
-                navigate('/signIn'); // 사용자가 확인한 경우 로그인 페이지로 이동
-            } else {
-                // 취소한 경우 추가 작업이 필요 없다면 아무 것도 하지 않음
-                window.close(); // 현재 창을 닫음 (브라우저 정책에 따라 동작하지 않을 수 있음)
-            }
-        }
-
         // 현재 상품 정보를 가져오기 (예: API 호출 또는 상태에서)
         const productData = await axios.get(`${apiUrl}/api/products/${productId}`); // 상품 정보 가져오기
         const product = productData.data;
@@ -139,6 +121,7 @@ const handleAddToCart = async () => {
 
     //바로 주문 
 const handleOrder = async () => {
+
     if (!color || !size) {
         setOptionError('옵션을 선택해주세요');
         return;
@@ -161,6 +144,25 @@ const handleOrder = async () => {
     };
 
     try {
+
+        const loginData = await axios.get(
+            `${apiUrl}/api/members/check-login`,
+            {
+                withCredentials: true,  // 쿠키에 저장된 JWT를 자동으로 전송
+            }
+        );
+        const isLogin = loginData.data;
+    
+        if (!isLogin) {
+            const confirmed = window.confirm('로그인 후 이용 가능합니다. 로그인 페이지로 이동하시겠습니까?');
+            if (confirmed) {
+                navigate(`/signIn?redirect=/products/${Number(productId)}`) // 사용자가 확인한 경우 로그인 페이지로 이동
+            } else {
+                // 취소한 경우 추가 작업이 필요 없다면 아무 것도 하지 않음
+                window.close(); // 현재 창을 닫음 (브라우저 정책에 따라 동작하지 않을 수 있음)
+            }
+        }
+
         const response = await axios.post(`${apiUrl}/api/orders`, data, {
             headers: {
                 'Content-Type': 'application/json',
@@ -186,7 +188,7 @@ const handleOrder = async () => {
                 navigate('/login');
             }
         } else {
-            setError('장바구니 담기 중 오류 발생');
+            setError('주문하기 중 오류 발생');
         }
     }
 };
