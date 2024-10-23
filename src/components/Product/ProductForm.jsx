@@ -43,7 +43,7 @@ const ProductForm = ({ open, product, onClose }) => {
 
         // 제품이 존재하는 경우: 수정
         if (product) {
-            const imageUrls = product.productImageDtos.map(image => `${filePath}${image.storeName}`)
+            const imageUrls = (product.productImageDtos || []).map(image => `${filePath}${image.storeName}`);
             setNewProduct({
                 name: product.name,
                 price: product.price,
@@ -290,7 +290,10 @@ const ProductForm = ({ open, product, onClose }) => {
         } catch (error) {
             if (error.response && error.response.status === 409) {
                 setError('이미 존재하는 상품명입니다.');
-            } else {
+            } else if(error.response && error.response.status === 413) {
+                setImageError('파일 크기가 너무 큽니다. 한 파일당 최대 1MB, 총 10MB 이하로 업로드 해주세요.');
+            }
+                else {
                 setError('상품 추가/수정 중 오류가 발생했습니다.');
             }
         }
@@ -358,19 +361,22 @@ const ProductForm = ({ open, product, onClose }) => {
                         helperText={stockQuantityError}
                         required
                     />
+                    <br></br>
+                    <br></br>
 
-                    {/* 하위 카테고리 선택 */}
-                    <FormControl fullWidth margin="normal">
-                        <InputLabel id="sub-category-label">카테고리</InputLabel>
+                    <FormControl fullWidth margin="none">
+                    <InputLabel id="sub-category-label" style={{ position: 'absolute', top: '-8px', left: '14px' }}>
+    카테고리
+</InputLabel>
                         <Select
                             labelId="sub-category-label"
-                            value={selectedSubCategory} // 선택된 카테고리 ID
+                            value={selectedSubCategory}
                             onChange={handleSubCategoryChange}
                             name="subCategory"
                             required
                         >
                             {subCategories.map((subCategory) => (
-                                <MenuItem key={subCategory.categoryId} value={subCategory.categoryId}> {/* categoryId를 value로 설정 */}
+                                <MenuItem key={subCategory.categoryId} value={subCategory.categoryId}>
                                     {subCategory.name}
                                 </MenuItem>
                             ))}
@@ -421,7 +427,10 @@ const ProductForm = ({ open, product, onClose }) => {
                         옵션 추가
                     </Button>
 
-                    <h3>상품 이미지</h3>
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                        <h3 style={{ marginRight: '10px' }}>상품 이미지</h3>
+                        <span style={{ fontSize: '0.9em', color: 'gray' }}>제한 용량 : 한 파일당 1MB, 총 10MB</span>
+                    </div>
                     {!product && (  // product가 없을 때만 렌더링
                         <input
                             type="file"

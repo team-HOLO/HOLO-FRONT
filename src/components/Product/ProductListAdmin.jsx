@@ -12,7 +12,6 @@ const ProductList = ({ products, onEdit, onDelete }) => {
           <TableCell>분류 코드</TableCell>
           <TableCell>상품명</TableCell>
           <TableCell>상품 설명</TableCell>
-          <TableCell>삭제 여부</TableCell>
           <TableCell>관리</TableCell>
         </TableRow>
       </TableHead>
