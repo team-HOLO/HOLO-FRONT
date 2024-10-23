@@ -1,8 +1,8 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import OrderItem from './OrderItem';  // OrderItem 컴포넌트 불러오기
+import OrderItem from './OrderItem';
 
-const OrderList = ({ orders = [], onCancelOrder, onUpdateStatus }) => { // 기본값 설정
+const OrderList = ({ orders = [], onCancelOrder, onUpdateStatus }) => {
     return (
         <Table>
             <TableHead>
@@ -15,7 +15,7 @@ const OrderList = ({ orders = [], onCancelOrder, onUpdateStatus }) => { // 기�
                 </TableRow>
             </TableHead>
             <TableBody>
-                {orders.length > 0 ? ( // orders가 비어있지 않은 경우
+                {orders.length > 0 ? (
                     orders.map(order => (
                         <OrderItem
                             key={order.orderId}
