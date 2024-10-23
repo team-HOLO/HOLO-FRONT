@@ -24,7 +24,7 @@ const ProductDetails = () => {
     const { productId } = useParams() // URL에서 productId 가져오기
 
     const handleInputChange = (event) => {
-        const value = Math.max(1, Number(event.target.value)); // 최소 1로 설정
+        const value = Math.max(1, Math.min(Number(event.target.value), product.stockQuantity)); // 최소 1, 최대 stockQuantity로 설정
         setQuantity(value);
     };
 
@@ -57,11 +57,18 @@ const handleAddToCart = async () => {
         const productData = await axios.get(`${apiUrl}/api/products/${productId}`); // 상품 정보 가져오기
         const product = productData.data;
 
+        //수량제한
+        if (quantity > product.stockQuantity) {
+          alert(`최대 (${product.stockQuantity})주문 가능합니다.`);
+          return;
+          }
+
         const data = {
             productId,
             quantity,
             color,
             size,
+            stockquantity: product.stockQuantity,
             name: product.name, // 상품 이름 추가
             price: product.price, // 상품 가격 추가
             image: product.image // 상품 이미지 URL 추가
@@ -145,6 +152,14 @@ const handleOrder = async () => {
     };
 
     try {
+        const productData = await axios.get(`${apiUrl}/api/products/${productId}`); // 상품 정보 가져오기
+        const product = productData.data;
+
+        //수량제한
+        if (quantity > product.stockQuantity) {
+                  alert(`최대 (${product.stockQuantity})주문 가능합니다.`);
+        return;
+        }
 
         const loginData = await axios.get(
             `${apiUrl}/api/members/check-login`,
@@ -160,10 +175,9 @@ const handleOrder = async () => {
                 navigate(`/signIn?redirect=/products/${Number(productId)}`) // 사용자가 확인한 경우 로그인 페이지로 이동
             } else {
                 // 취소한 경우 추가 작업이 필요 없다면 아무 것도 하지 않음
-                window.close(); // 현재 창을 닫음 (브라우저 정책에 따라 동작하지 않을 수 있음)
+               return; //
             }
-        }
-
+        }else{
         // 성공적으로 주문 후 order 페이지로 이동
         navigate('/order', {
             state: {
@@ -174,6 +188,7 @@ const handleOrder = async () => {
                 size,
             },
         });
+      }
     } catch (error) {
         if (error.response && (error.response.status === 403 || error.response.status === 401)) {
             if (window.confirm('로그인 후 이용가능합니다. 로그인 페이지로 이동하시겠습니까?')) {
