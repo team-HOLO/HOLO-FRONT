@@ -52,15 +52,19 @@ export default function SignUp() {
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
+  const [passwordConfirmError, setPasswordConfirmError] = React.useState(false);
+  const [passwordConfirmMessage, setPasswordConfirmMessage] =
+    React.useState("");
   const [telError, setTelError] = React.useState(false);
   const [telErrorMessage, setTelErrorMessage] = React.useState("");
   const [ageError, setAgeError] = React.useState(false);
   const [ageErrorMessage, setAgeErrorMessage] = React.useState("");
   const [gender, setGender] = React.useState(null);
+  const [password, setPassword] = React.useState("");
+  const [passwordConfirm, setPasswordConfirm] = React.useState("");
 
   const validateInputs = () => {
     const email = document.getElementById("email");
-    const password = document.getElementById("password");
     const name = document.getElementById("name");
     const tel = document.getElementById("tel");
     const age = document.getElementById("age");
@@ -69,20 +73,29 @@ export default function SignUp() {
 
     if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
       setEmailError(true);
-      setEmailErrorMessage("올바른 이메일 주소를 입력하세요.");
+      setEmailErrorMessage("@가 포함된 유효한 이메일 주소를 입력해주세요.");
       isValid = false;
     } else {
       setEmailError(false);
       setEmailErrorMessage("");
     }
 
-    if (!password.value || password.value.length < 6) {
+    if (!password || password.length < 6) {
       setPasswordError(true);
       setPasswordErrorMessage("비밀번호는 최소 6자 이상이어야 합니다.");
       isValid = false;
     } else {
       setPasswordError(false);
       setPasswordErrorMessage("");
+    }
+
+    if (password !== passwordConfirm) {
+      setPasswordConfirmError(true);
+      setPasswordConfirmMessage("비밀번호가 일치하지 않습니다.");
+      isValid = false;
+    } else {
+      setPasswordConfirmError(false);
+      setPasswordConfirmMessage("");
     }
 
     if (!name.value || name.value.length < 1) {
@@ -128,7 +141,7 @@ export default function SignUp() {
     const signupData = {
       name: data.get("name"),
       email: data.get("email"),
-      password: data.get("password"),
+      password: password,
       tel: data.get("tel"),
       gender: gender === "Male", // 남자는 true, 여자는 false
       age: data.get("age"),
@@ -210,11 +223,31 @@ export default function SignUp() {
                 placeholder="••••••"
                 type="password"
                 id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 autoComplete="new-password"
                 variant="outlined"
                 error={passwordError}
                 helperText={passwordErrorMessage}
                 color={passwordError ? "error" : "primary"}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel htmlFor="passwordConfirm">비밀번호 확인</FormLabel>
+              <TextField
+                required
+                fullWidth
+                name="passwordConfirm"
+                placeholder="••••••"
+                type="password"
+                id="passwordConfirm"
+                value={passwordConfirm}
+                onChange={(e) => setPasswordConfirm(e.target.value)}
+                autoComplete="new-password"
+                variant="outlined"
+                error={passwordConfirmError}
+                helperText={passwordConfirmMessage}
+                color={passwordConfirmError ? "error" : "primary"}
               />
             </FormControl>
             <FormControl>

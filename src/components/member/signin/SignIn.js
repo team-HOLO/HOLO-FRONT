@@ -119,7 +119,7 @@ export default function SignIn(props) {
 
     if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
       setEmailError(true);
-      setEmailErrorMessage("Please enter a valid email address.");
+      setEmailErrorMessage("@가 포함된 유효한 이메일 주소를 입력해주세요.");
       isValid = false;
     } else {
       setEmailError(false);
@@ -128,7 +128,7 @@ export default function SignIn(props) {
 
     if (!password.value || password.value.length < 6) {
       setPasswordError(true);
-      setPasswordErrorMessage("Password must be at least 6 characters long.");
+      setPasswordErrorMessage("비밀번호는 6자리 이상이어야 합니다.");
       isValid = false;
     } else {
       setPasswordError(false);
