@@ -12,11 +12,6 @@ const ProductItem = ({ product, onEdit, onDelete }) => {
       <TableCell>{product.name}</TableCell>
       <TableCell>{product.description}</TableCell>
       <TableCell>
-          {product.isDeleted ? (<span style={{ color: 'red' }}>삭제됨</span>) : 
-          (<span style={{ color: 'green' }}>활성</span>
-  )}
-</TableCell>
-      <TableCell>
         <IconButton onClick={() => onEdit(product)} aria-label="edit">
           <EditIcon />
         </IconButton>

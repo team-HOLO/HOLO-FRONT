@@ -4,7 +4,7 @@ import { Container, TextField, TablePagination, Typography, Select, MenuItem, Fo
 import ProductItem from '../../components/Product/ProductIem';
 import ProductListAdmin from '../../components/Product/ProductListAdmin';
 import ProductList from '../../components/Product/productList/ProductList';
-import DeleteConfirmationDialog from 'components/admin/category/DeleteConfirmationDialog';
+import DeleteProductConfirmationDialog from 'components/Product/DeleteProductConfirmationDialog';
 import ProductForm from '../../components/Product/ProductForm';
 
 const ProductManagementPage = () => {
@@ -137,10 +137,10 @@ const ProductManagementPage = () => {
             rowsPerPage={10} // 고정된 페이지 크기
             rowsPerPageOptions={[]} // 선택 옵션 제거
           />
-          <DeleteConfirmationDialog
+          <DeleteProductConfirmationDialog
             open={deleteDialogOpen}
-            categoryName={selectedProduct?.name}
-            categoryId={selectedProduct?.productId}
+            productName={selectedProduct?.name}
+            productId={selectedProduct?.productId}
             onClose={() => setDeleteDialogOpen(false)}
             onDelete={handleDeleteConfirm}
           />
