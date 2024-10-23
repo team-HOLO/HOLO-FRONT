@@ -57,11 +57,18 @@ const handleAddToCart = async () => {
         const productData = await axios.get(`${apiUrl}/api/products/${productId}`); // 상품 정보 가져오기
         const product = productData.data;
 
+        //수량제한
+        if (quantity > product.stockQuantity) {
+          alert(`최대 (${product.stockQuantity})주문 가능합니다.`);
+          return;
+          }
+
         const data = {
             productId,
             quantity,
             color,
             size,
+            stockquantity: product.stockQuantity,
             name: product.name, // 상품 이름 추가
             price: product.price, // 상품 가격 추가
             image: product.image // 상품 이미지 URL 추가
@@ -145,6 +152,14 @@ const handleOrder = async () => {
     };
 
     try {
+        const productData = await axios.get(`${apiUrl}/api/products/${productId}`); // 상품 정보 가져오기
+        const product = productData.data;
+
+        //수량제한
+        if (quantity > product.stockQuantity) {
+                  alert(`최대 (${product.stockQuantity})주문 가능합니다.`);
+        return;
+        }
 
         const loginData = await axios.get(
             `${apiUrl}/api/members/check-login`,
