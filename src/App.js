@@ -68,7 +68,6 @@ function App() {
           }}
         >
           <Header
-            isAdmin={true}
             categories={categories}
             refreshCategories={fetchCategoriesHeader}
           />
