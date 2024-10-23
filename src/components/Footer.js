@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Container, Typography } from '@mui/material';
-import {Link} from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 function Footer() {
     return (
@@ -12,11 +12,7 @@ function Footer() {
                 mt: 'auto',
                 backgroundColor: (theme) =>
                     theme.palette.mode === 'light' ? theme.palette.grey[200] : theme.palette.grey[800],
-                zIndex: 1300, // z-index 값을 높게 설정하여 사이드바 위에 표시
-                position: 'fixed', // 위치를 상대적으로 설정
-                bottom: 0,
-                left:0,
-                width: '100%'
+                width: '100%',
             }}
         >
             <Container maxWidth="sm">
