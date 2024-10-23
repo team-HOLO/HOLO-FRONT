@@ -25,6 +25,11 @@ import MemberUpdatePage from "./pages/MemberUpdate";
 import OrderList from "./components/order/OrderList";
 import OrderManagementPage from "./pages/admin/OrderManagementPage";
 import MyPage from "pages/myPage/MyPage";
+
+import AdminRoute from "components/common/AdminRoute";
+import PrivateRoute from "components/common/PrivateRoute";
+import NoAccessPage from "pages/admin/NoAccessPage";
+
 const theme = createTheme({
   palette: {
     primary: {
@@ -63,7 +68,6 @@ function App() {
           }}
         >
           <Header
-            isAdmin={true}
             categories={categories}
             refreshCategories={fetchCategoriesHeader}
           />
@@ -77,16 +81,19 @@ function App() {
               <Route path="products/:productId" element={<ProductDetails />} />
               <Route path="products/category/:categoryId" element={<ProductList />} />
                <Route path="orders" element={<OrderList />} />
-              <Route path="/mypage" element={<MyPage />} />
-              <Route path="/admin" element={<AdminPage />}>
+              {/* PrivateRoute로 보호 */}
+              <Route path="/mypage" element={<PrivateRoute element={<MyPage />} />} />
+
+              {/* AdminRoute로 보호 */}
+              <Route path="/admin" element={<AdminRoute element={<AdminPage />} />}>
                 <Route index element={<AdminDashboard />} />
                 <Route
-                  path="categories"
-                  element={
-                    <CategoryManagementPage
-                      refreshCategories={fetchCategoriesHeader}
-                    />
-                  }
+                    path="categories"
+                    element={
+                      <CategoryManagementPage
+                          refreshCategories={fetchCategoriesHeader}
+                      />
+                    }
                 />
                 <Route path="members" element={<Home />} />
                 <Route path="orders" element={<OrderManagementPage />} />
@@ -100,6 +107,7 @@ function App() {
 
                <Route path="/order" element={<OrderPage />} />
                <Route path="/ordercomplete" element={<OrderCompletePage />} />
+               <Route path="/no-access" element={<NoAccessPage />} />
             </Routes>
           </div>
           <Footer />
