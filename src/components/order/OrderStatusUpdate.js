@@ -1,60 +1,41 @@
 import React, { useState } from 'react';
-import { Button, Modal, Box, MenuItem, Select, Typography, Snackbar } from '@mui/material';
-import MuiAlert from '@mui/material/Alert';
+import { Button, Modal, Box, MenuItem, Select, Typography } from '@mui/material';
 
 const style = {
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    color: 'background.paper',
-    boxShadow: 24,
     p: 4,
     borderRadius: 2,
+    bgcolor: 'background.paper',
 };
 
-const Alert = React.forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
-function OrderStatusUpdate({ orderId,currentStatus, onUpdateStatus }) {
+function OrderStatusUpdate({ orderId, currentStatus, onUpdateStatus }) {
     const [newStatus, setNewStatus] = useState('ORDER');
     const [open, setOpen] = useState(false);
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
-    const [message, setMessage] = useState('');
 
-    const handleStatusChange = (e) => {
-        setNewStatus(e.target.value);
-    };
-
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
-
+    // 상태 변경 제출
     const handleSubmit = () => {
         onUpdateStatus(orderId, newStatus);
-        setMessage(`상태가 ${newStatus}로 변경되었습니다.`);
-        setSnackbarOpen(true);
-        handleClose();  // 모달 닫기
+        handleClose();
     };
 
-    const handleSnackbarClose = () => {
-        setSnackbarOpen(false);
-    };
+    // 모달 닫기
+    const handleClose = () => setOpen(false);
 
     return (
         <div>
-            <Button variant="contained" onClick={handleOpen}>
+            <Button variant="contained" onClick={() => setOpen(true)}>
                 상태 변경
             </Button>
-             <Typography variant="body1" sx={{ display: 'inline', marginLeft: 1 }}>
-              {currentStatus}
-                        </Typography>
+            <Typography variant="body1" sx={{ display: 'inline', marginLeft: 1 }}>
+                {currentStatus}
+            </Typography>
             <Modal open={open} onClose={handleClose}>
                 <Box sx={style}>
-                    <Typography variant="h6" component="h2">
-                        주문 상태 변경
-                    </Typography>
-                    <Select value={newStatus} onChange={handleStatusChange} fullWidth>
+                    <Typography variant="h6">주문 상태 변경</Typography>
+                    <Select value={newStatus} onChange={(e) => setNewStatus(e.target.value)} fullWidth>
                         <MenuItem value="ORDER">주문 완료</MenuItem>
                         <MenuItem value="SHIPPING">배송중</MenuItem>
                         <MenuItem value="FINISH">배송 완료</MenuItem>
@@ -65,11 +46,6 @@ function OrderStatusUpdate({ orderId,currentStatus, onUpdateStatus }) {
                     </Button>
                 </Box>
             </Modal>
-            <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
-                <Alert onClose={handleSnackbarClose} severity="success">
-                    {message}
-                </Alert>
-            </Snackbar>
         </div>
     );
 }
