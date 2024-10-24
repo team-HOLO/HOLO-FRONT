@@ -319,7 +319,9 @@ export default function SignUp() {
             <Button
               fullWidth
               variant="outlined"
-              onClick={() => alert("Google로 회원가입")}
+              onClick={() =>
+                  (window.location.href = `${process.env.REACT_APP_API_URL}/oauth2/authorization/google`)
+              }
               startIcon={<GoogleIcon />}
             >
               Google로 회원가입
