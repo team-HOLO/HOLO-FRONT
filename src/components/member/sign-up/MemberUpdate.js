@@ -277,34 +277,37 @@ export default function MemberUpdate() {
               </RadioGroup>
             </FormControl>
 
-            {/* 비밀번호 필드 추가 */}
-            <FormControl>
-              <FormLabel htmlFor="password">새 비밀번호</FormLabel>
-              <TextField
-                fullWidth
-                id="password"
-                type="password"
-                value={password}
-                name="password"
-                error={passwordError}
-                helperText={passwordHelperText}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </FormControl>
+            {memberData.password !== null && (
+              <>
+                <FormControl>
+                  <FormLabel htmlFor="password">새 비밀번호</FormLabel>
+                  <TextField
+                    fullWidth
+                    id="password"
+                    type="password"
+                    value={password}
+                    name="password"
+                    error={passwordError}
+                    helperText={passwordHelperText}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </FormControl>
 
-            <FormControl>
-              <FormLabel htmlFor="passwordConfirm">비밀번호 확인</FormLabel>
-              <TextField
-                fullWidth
-                id="passwordConfirm"
-                type="password"
-                value={passwordConfirm}
-                name="passwordConfirm"
-                error={passwordConfirmError}
-                helperText={passwordHelperText}
-                onChange={(e) => setPasswordConfirm(e.target.value)}
-              />
-            </FormControl>
+                <FormControl>
+                  <FormLabel htmlFor="passwordConfirm">비밀번호 확인</FormLabel>
+                  <TextField
+                    fullWidth
+                    id="passwordConfirm"
+                    type="password"
+                    value={passwordConfirm}
+                    name="passwordConfirm"
+                    error={passwordConfirmError}
+                    helperText={passwordHelperText}
+                    onChange={(e) => setPasswordConfirm(e.target.value)}
+                  />
+                </FormControl>
+              </>
+            )}
 
             <Button type="submit" fullWidth variant="contained">
               정보 수정
