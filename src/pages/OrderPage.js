@@ -88,9 +88,12 @@ const OrderPage = () => {
             });
 
             console.log('주문 성공:', response.data);
-
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const updatedCart = cart.filter(item =>
+                !orderItems.some(orderItem => orderItem.productId === item.productId)
+            );
             // 주문 후 로컬스토리지 비우기
-            localStorage.removeItem('cart');
+            localStorage.setItem('cart', JSON.stringify(updatedCart));
             //총가격 계산
             const totalAmount = productDetails.reduce((total, product, index) => {
                 const itemPrice = product.price * orderItems[index].quantity;
