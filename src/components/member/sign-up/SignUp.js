@@ -57,21 +57,19 @@ export default function SignUp() {
     React.useState("");
   const [telError, setTelError] = React.useState(false);
   const [telErrorMessage, setTelErrorMessage] = React.useState("");
-  const [ageError, setAgeError] = React.useState(false);
-  const [ageErrorMessage, setAgeErrorMessage] = React.useState("");
+
   const [gender, setGender] = React.useState(null);
   const [password, setPassword] = React.useState("");
   const [passwordConfirm, setPasswordConfirm] = React.useState("");
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const path = queryParams.get('redirect') || '/'; // 기본값은 '/'로 설정
+  const path = queryParams.get("redirect") || "/"; // 기본값은 '/'로 설정
 
   const validateInputs = () => {
     const email = document.getElementById("email");
     const name = document.getElementById("name");
     const tel = document.getElementById("tel");
-    const age = document.getElementById("age");
 
     let isValid = true;
 
@@ -120,15 +118,6 @@ export default function SignUp() {
       setTelErrorMessage("");
     }
 
-    if (!age.value || isNaN(age.value) || age.value <= 0) {
-      setAgeError(true);
-      setAgeErrorMessage("유효한 나이를 입력하세요.");
-      isValid = false;
-    } else {
-      setAgeError(false);
-      setAgeErrorMessage("");
-    }
-
     if (gender === null) {
       alert("성별을 선택해주세요.");
       isValid = false;
@@ -148,7 +137,7 @@ export default function SignUp() {
       password: password,
       tel: data.get("tel"),
       gender: gender === "Male", // 남자는 true, 여자는 false
-      age: data.get("age"),
+
       isAdmin: false, // 기본 값 false
     };
 
@@ -302,19 +291,7 @@ export default function SignUp() {
                 />
               </RadioGroup>
             </FormControl>
-            <FormControl>
-              <FormLabel htmlFor="age">나이</FormLabel>
-              <TextField
-                required
-                fullWidth
-                id="age"
-                placeholder="25"
-                name="age"
-                variant="outlined"
-                error={ageError}
-                helperText={ageErrorMessage}
-              />
-            </FormControl>
+
             <Button
               type="submit"
               fullWidth
