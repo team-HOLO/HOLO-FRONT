@@ -59,6 +59,8 @@ const OrderPage = () => {
    // 주문 처리
     const handleOrder = async () => {
         setOrderError(''); // 초기화
+
+
         if (!shippingAddress || !recipientName) {
             setOrderError('배송지와 받는 사람의 이름을 입력해주세요');
             return;
@@ -104,9 +106,9 @@ const OrderPage = () => {
                 state: {
                     orderDetails: {
                         products: orderProductsWithQuantity,
-                        recipientName,
-                        shippingAddress,
                         shippingRequest,
+                        shippingAddress,
+                        recipientName,
                         totalAmount,
                     },
                 },

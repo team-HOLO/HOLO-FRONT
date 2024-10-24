@@ -29,9 +29,6 @@ function OrderStatusUpdate({ orderId, currentStatus, onUpdateStatus }) {
             <Button variant="contained" onClick={() => setOpen(true)}>
                 상태 변경
             </Button>
-            <Typography variant="body1" sx={{ display: 'inline', marginLeft: 1 }}>
-                {currentStatus}
-            </Typography>
             <Modal open={open} onClose={handleClose}>
                 <Box sx={style}>
                     <Typography variant="h6">주문 상태 변경</Typography>
