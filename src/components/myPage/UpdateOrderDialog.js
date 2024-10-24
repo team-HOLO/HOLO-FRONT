@@ -36,15 +36,15 @@ const UpdateOrderDialog = ({ open, orderId, orderInfo, onClose, onUpdate }) => {
                     label="요청 사항"
                     fullWidth
                     margin="dense"
-                    value={recipientName}
-                    onChange={(e) => setRecipientName(e.target.value)}
+                    value={shippingRequest}
+                    onChange={(e) => setShippingRequest(e.target.value)}
                 />
                 <TextField
                     label="받는 사람"
                     fullWidth
                     margin="dense"
-                    value={shippingRequest}
-                    onChange={(e) => setShippingRequest(e.target.value)}
+                    value={recipientName}
+                    onChange={(e) => setRecipientName(e.target.value)}
                 />
             </DialogContent>
             <DialogActions>
