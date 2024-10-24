@@ -15,7 +15,7 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { GoogleIcon } from "./CustomIcons";
-import { useNavigate } from "react-router-dom"; // useNavigate 훅 추가
+import { useNavigate, useLocation } from "react-router-dom"; // useNavigate 훅 추가
 const apiUrl = process.env.REACT_APP_API_URL;
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -62,6 +62,10 @@ export default function SignUp() {
   const [gender, setGender] = React.useState(null);
   const [password, setPassword] = React.useState("");
   const [passwordConfirm, setPasswordConfirm] = React.useState("");
+
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const path = queryParams.get('redirect') || '/'; // 기본값은 '/'로 설정
 
   const validateInputs = () => {
     const email = document.getElementById("email");
@@ -169,7 +173,8 @@ export default function SignUp() {
       .then((message) => {
         console.log("회원가입 성공:", message);
         alert("회원가입 성공");
-        navigate("/signin"); // 회원가입 성공 시 /signin 페이지로 리다이렉트
+        // navigate("/signin"); // 회원가입 성공 시 /signin 페이지로 리다이렉트
+        navigate(`/signin?redirect=${encodeURIComponent(path)}`);
       })
       .catch((error) => {
         console.error("회원가입 실패:", error.message);
