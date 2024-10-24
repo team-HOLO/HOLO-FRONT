@@ -17,17 +17,34 @@ const ProductList = () => {
     const [pageSize, setPageSize] = useState(20); // 페이지 당 아이템 수 (기본값 20)
     const [zoomedIn, setZoomedIn] = useState(null); // 줌인 상태 관리
     const [currentImages, setCurrentImages] = useState({});
+    const [currentCategoryId, setCurrentCategoryId] = useState(categoryId); // 현재 카테고리 상태
     const apiUrl = process.env.REACT_APP_API_URL;
+
+    useEffect(() => {
+        resetProductListState(); // 상태 초기화
+        fetchProducts();
+        setCurrentCategoryId(categoryId); // 현재 카테고리 ID 업데이트
+    }, [categoryId]); // 카테고리 ID가 변경될 때마다 상태 초기화
 
     // API 호출 함수
     const fetchProducts = () => {
+
+        // params 객체 초기화
+        const params = {
+            sortBy: sortBy,
+            page: page - 1,
+            size: pageSize,
+            productName: productSearchCond,
+        };
+
+        // categoryId가 현재 카테고리와 다르면 productName 추가
+        if (categoryId !== currentCategoryId) {
+            params.productName = '';
+        }
+
+
         axios.get(`${apiUrl}/api/products/category/${categoryId}`, {
-            params: {
-                productName: productSearchCond,
-                sortBy: sortBy,
-                page: page - 1,
-                size: pageSize,
-            }
+            params
         })
             .then(response => {
                 setProducts(response.data.content);
@@ -70,14 +87,11 @@ const ProductList = () => {
         setPage(1);
     };
 
-    useEffect(() => {
-        resetProductListState(); // 상태 초기화
-        fetchProducts();
-    }, [categoryId]); // 카테고리 ID가 변경될 때마다 상태 초기화
+
 
     useEffect(() => {
         fetchProducts();
-    }, [sortBy, page, pageSize]); // 정렬 기준, 페이지, 페이지 크기 변경 시 데이터 로드
+    }, [sortBy, page, pageSize]); // 정렬 기준, 페이지, 페이지 크기 변경 시 데이터 로드u
 
     const handleMouseEnter = (productId) => {
         setCurrentImages((prevImages) => ({
@@ -197,7 +211,7 @@ const ProductList = () => {
                                     <CardContent>
                                         <Typography variant="h6">{product.name}</Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                        {product.price.toLocaleString()} 원
+                                            {product.price.toLocaleString()} 원
                                         </Typography>
                                     </CardContent>
                                 </CardActionArea>

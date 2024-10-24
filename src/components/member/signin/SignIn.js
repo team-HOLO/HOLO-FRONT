@@ -17,7 +17,7 @@ import { styled } from "@mui/material/styles";
 import { GoogleIcon } from "./CustomIcons";
 import AppTheme from "../theme/AppTheme";
 import ColorModeSelect from "../theme/ColorModeSelect";
-import { useNavigate } from "react-router-dom"; // useNavigate 훅 추가
+import { useNavigate, useLocation  } from "react-router-dom"; // useNavigate 훅 추가
 
 const apiUrl = process.env.REACT_APP_API_URL;
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -63,6 +63,9 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 
 export default function SignIn(props) {
   const navigate = useNavigate(); // useNavigate 훅 호출
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const path = queryParams.get('redirect') || '/'; // 기본값은 '/'로 설정
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
   const [passwordError, setPasswordError] = React.useState(false);
@@ -99,13 +102,14 @@ export default function SignIn(props) {
         console.log("JWT Token: ", token);
         alert("로그인 성공");
 
-        navigate("/"); // 회원가입 성공 시 /signin 페이지로 리다이렉트
+        navigate(path); // 회원가입 성공 시 /signin 페이지로 리다이렉트
 
         // Redirect user or handle the logged-in state
       } else {
         console.error("Login failed");
         alert("등록된 회원이 아닙니다!");
-        navigate("/signin"); // 회원가입 성공 시 /signin 페이지로 리다이렉트
+        // navigate("/signin"); // 회원가입 성공 시 /signin 페이지로 리다이렉트
+        navigate(`/signin?redirect=${encodeURIComponent(path)}`);
       }
     } catch (error) {
       console.error("An error occurred while logging in: ", error);
@@ -213,7 +217,7 @@ export default function SignIn(props) {
               계정이 없으신가요?{" "}
               <span>
                 <Link
-                  href="/signup"
+                  href={`/signup?redirect=${encodeURIComponent(path)}`}
                   variant="body2"
                   sx={{ alignSelf: "center" }}
                 >
