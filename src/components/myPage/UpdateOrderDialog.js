@@ -16,6 +16,10 @@ const UpdateOrderDialog = ({ open, orderId, orderInfo, onClose, onUpdate }) => {
     }, [open, orderInfo]);
 
     const handleUpdate = () => {
+        if (!shippingAddress || !recipientName) {
+            alert('배송지와 받는 사람의 이름은 필수입니다.');
+            return;
+        }
         const updatedData = { shippingAddress, recipientName, shippingRequest };
         onUpdate(orderId, updatedData);
         onClose();
@@ -33,18 +37,18 @@ const UpdateOrderDialog = ({ open, orderId, orderInfo, onClose, onUpdate }) => {
                     onChange={(e) => setShippingAddress(e.target.value)}
                 />
                 <TextField
-                    label="요청 사항"
-                    fullWidth
-                    margin="dense"
-                    value={shippingRequest}
-                    onChange={(e) => setShippingRequest(e.target.value)}
-                />
-                <TextField
                     label="받는 사람"
                     fullWidth
                     margin="dense"
                     value={recipientName}
                     onChange={(e) => setRecipientName(e.target.value)}
+                />
+                <TextField
+                    label="요청 사항"
+                    fullWidth
+                    margin="dense"
+                    value={shippingRequest}
+                    onChange={(e) => setShippingRequest(e.target.value)}
                 />
             </DialogContent>
             <DialogActions>
