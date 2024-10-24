@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AppBar, Toolbar, Typography, Box, Button } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import CategoryMenu from "components/CategoryMenu";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -8,6 +8,7 @@ function Header({ categories, refreshCategories }) {
   const [stateIsAdmin, setStateIsAdmin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 여부 확인 state
   const location = useLocation(); // 페이지 위치 감지
+  const navigate = useNavigate(); // navigate 함수 가져오기
 
   // 페이지가 로드되거나 변경될 때마다 관리자 권한 및 로그인 여부
   useEffect(() => {
@@ -50,73 +51,95 @@ function Header({ categories, refreshCategories }) {
       });
       setIsLoggedIn(false); // 로그아웃 후 로그인 상태 변경
       setStateIsAdmin(false); // 로그아웃 후 관리자 여부 변경
+      navigate("/");
     } catch (error) {
       console.error("Error during logout:", error);
     }
   };
 
   return (
-      <AppBar
-          position="sticky"
-          sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
-      >
-        <Toolbar>
-          <Typography variant="h6" sx={{ mr: 2 }}>
-            <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
-              HOLO
+    <AppBar
+      position="sticky"
+      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+    >
+      <Toolbar>
+        <Typography variant="h6" sx={{ mr: 2 }}>
+          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+            HOLO
+          </Link>
+        </Typography>
+
+        {/* 카테고리 메뉴 */}
+        <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
+          <CategoryMenu
+            categories={categories}
+            refreshCategories={refreshCategories}
+          />
+        </Box>
+
+        {/* 관리자 메뉴 : stateIsAdmin이 true일 때만 렌더링*/}
+        {stateIsAdmin && (
+          <Typography sx={{ mx: 2 }}>
+            <Link
+              to="/admin"
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              관리
             </Link>
           </Typography>
+        )}
 
-          {/* 카테고리 메뉴 */}
-          <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
-            <CategoryMenu categories={categories} refreshCategories={refreshCategories} />
-          </Box>
+        {/* 장바구니 및 사용자 메뉴 */}
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Link
+            to="/cart"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+              color: "inherit",
+            }}
+          >
+            <AddShoppingCartIcon style={{ width: 50, padding: "0 10px" }} />
+          </Link>
 
-          {/* 관리자 메뉴 : stateIsAdmin이 true일 때만 렌더링*/}
-          {stateIsAdmin && (
-              <Typography sx={{ mx: 2 }}>
-                <Link to="/admin" style={{ textDecoration: "none", color: "inherit" }}>
-                  관리
-                </Link>
-              </Typography>
+          {isLoggedIn ? (
+            <>
+              <Button
+                component={Link}
+                to="/mypage"
+                color="inherit"
+                sx={{ mx: 1 }}
+              >
+                마이페이지
+              </Button>
+              <Button color="inherit" onClick={handleLogout} sx={{ mx: 1 }}>
+                로그아웃
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                component={Link}
+                to="/signin"
+                color="inherit"
+                sx={{ mx: 1 }}
+              >
+                로그인
+              </Button>
+              <Button
+                component={Link}
+                to="/signup"
+                color="inherit"
+                sx={{ mx: 1 }}
+              >
+                회원가입
+              </Button>
+            </>
           )}
-
-          {/* 장바구니 및 사용자 메뉴 */}
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Link
-                to="/cart"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  textDecoration: "none",
-                  color: "inherit",
-                }}
-            >
-              <AddShoppingCartIcon style={{ width: 50, padding: "0 10px" }} />
-            </Link>
-
-            {isLoggedIn ? (
-                <>
-                  <Button component={Link} to="/mypage" color="inherit" sx={{ mx: 1 }}>
-                    마이페이지
-                  </Button>
-                  <Button color="inherit" onClick={handleLogout} sx={{ mx: 1 }}>
-                    로그아웃
-                  </Button>
-                </>
-            ) : (
-                <>
-                  <Button component={Link} to="/signin" color="inherit" sx={{ mx: 1 }}>
-                    로그인
-                  </Button>
-                  <Button component={Link} to="/signup" color="inherit" sx={{ mx: 1 }}>
-                    회원가입
-                  </Button>
-                </>
-            )}
-          </Box>
-        </Toolbar>
-      </AppBar>
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 }
 

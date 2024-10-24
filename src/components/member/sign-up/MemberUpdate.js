@@ -47,7 +47,7 @@ export default function MemberUpdate() {
   const [memberData, setMemberData] = useState({});
   const [nameError, setNameError] = useState(false);
   const [telError, setTelError] = useState(false);
-  const [ageError, setAgeError] = useState(false);
+
   const [passwordError, setPasswordError] = useState(false);
   const [passwordConfirmError, setPasswordConfirmError] = useState(false);
   const [passwordHelperText, setPasswordHelperText] = useState("");
@@ -71,7 +71,6 @@ export default function MemberUpdate() {
   const validateInputs = () => {
     const name = document.getElementById("name");
     const tel = document.getElementById("tel");
-    const age = document.getElementById("age");
 
     let isValid = true;
 
@@ -89,11 +88,14 @@ export default function MemberUpdate() {
       setTelError(false);
     }
 
-    if (!age.value || isNaN(age.value) || age.value <= 0) {
-      setAgeError(true);
+    if (password && password.length < 6) {
+      setPasswordError(true);
+      setPasswordHelperText("비밀번호는 최소 6자 이상이어야 합니다.");
       isValid = false;
-    } else {
-      setAgeError(false);
+    } else if (!passwordError && password === passwordConfirm) {
+      setPasswordError(false);
+
+      setPasswordHelperText("");
     }
 
     if (password !== passwordConfirm) {
@@ -101,7 +103,7 @@ export default function MemberUpdate() {
       setPasswordConfirmError(true);
       setPasswordHelperText("비밀번호가 일치하지 않습니다.");
       isValid = false;
-    } else {
+    } else if (password.length >= 6) {
       setPasswordError(false);
       setPasswordConfirmError(false);
       setPasswordHelperText("");
@@ -125,7 +127,7 @@ export default function MemberUpdate() {
       name: data.get("name"),
       tel: data.get("tel"),
       gender: gender === "Male",
-      age: data.get("age"),
+
       password: password ? password : undefined, // 비밀번호가 있을 때만 업데이트
     };
 
@@ -275,49 +277,37 @@ export default function MemberUpdate() {
               </RadioGroup>
             </FormControl>
 
-            <FormControl>
-              <FormLabel htmlFor="age">나이</FormLabel>
-              <TextField
-                required
-                fullWidth
-                id="age"
-                value={memberData.age || ""}
-                name="age"
-                error={ageError}
-                onChange={(e) =>
-                  setMemberData({ ...memberData, age: e.target.value })
-                }
-              />
-            </FormControl>
+            {memberData.password !== null && (
+              <>
+                <FormControl>
+                  <FormLabel htmlFor="password">새 비밀번호</FormLabel>
+                  <TextField
+                    fullWidth
+                    id="password"
+                    type="password"
+                    value={password}
+                    name="password"
+                    error={passwordError}
+                    helperText={passwordHelperText}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </FormControl>
 
-            {/* 비밀번호 필드 추가 */}
-            <FormControl>
-              <FormLabel htmlFor="password">새 비밀번호</FormLabel>
-              <TextField
-                fullWidth
-                id="password"
-                type="password"
-                value={password}
-                name="password"
-                error={passwordError}
-                helperText={passwordHelperText}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </FormControl>
-
-            <FormControl>
-              <FormLabel htmlFor="passwordConfirm">비밀번호 확인</FormLabel>
-              <TextField
-                fullWidth
-                id="passwordConfirm"
-                type="password"
-                value={passwordConfirm}
-                name="passwordConfirm"
-                error={passwordConfirmError}
-                helperText={passwordHelperText}
-                onChange={(e) => setPasswordConfirm(e.target.value)}
-              />
-            </FormControl>
+                <FormControl>
+                  <FormLabel htmlFor="passwordConfirm">비밀번호 확인</FormLabel>
+                  <TextField
+                    fullWidth
+                    id="passwordConfirm"
+                    type="password"
+                    value={passwordConfirm}
+                    name="passwordConfirm"
+                    error={passwordConfirmError}
+                    helperText={passwordHelperText}
+                    onChange={(e) => setPasswordConfirm(e.target.value)}
+                  />
+                </FormControl>
+              </>
+            )}
 
             <Button type="submit" fullWidth variant="contained">
               정보 수정
