@@ -4,14 +4,14 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } 
 const UpdateOrderDialog = ({ open, orderId, orderInfo, onClose, onUpdate }) => {
     const [shippingAddress, setShippingAddress] = useState(orderInfo.shippingAddress || '');
     const [recipientName, setRecipientName] = useState(orderInfo.recipientName || '');
-    const [shippingRequest, setshippingRequest] = useState(orderInfo.shippingRequest || '');
+    const [shippingRequest, setShippingRequest] = useState(orderInfo.shippingRequest || '');
 
     useEffect(() => {
         if (open) {
             // 다이얼로그가 열릴 때마다 초기 데이터를 로드
             setShippingAddress(orderInfo.shippingAddress || '');
             setRecipientName(orderInfo.recipientName || '');
-            setshippingRequest(orderInfo.shippingRequest || '');
+            setShippingRequest(orderInfo.shippingRequest || '');
         }
     }, [open, orderInfo]);
 
@@ -33,18 +33,18 @@ const UpdateOrderDialog = ({ open, orderId, orderInfo, onClose, onUpdate }) => {
                     onChange={(e) => setShippingAddress(e.target.value)}
                 />
                 <TextField
-                    label="받는 사람"
+                    label="요청 사항"
                     fullWidth
                     margin="dense"
                     value={recipientName}
                     onChange={(e) => setRecipientName(e.target.value)}
                 />
                 <TextField
-                    label="요청 사항"
+                    label="받는 사람"
                     fullWidth
                     margin="dense"
                     value={shippingRequest}
-                    onChange={(e) => setshippingRequest(e.target.value)}
+                    onChange={(e) => setShippingRequest(e.target.value)}
                 />
             </DialogContent>
             <DialogActions>
