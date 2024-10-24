@@ -3,7 +3,8 @@ import { TableRow, TableCell, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import OrderStatusUpdate from './OrderStatusUpdate';
 
-const OrderItem = ({ order, onCancelOrder, onUpdateStatus }) => {
+// 주문관리에 필요없다고 판단되어 주석처리
+      const OrderItem = ({ order, /*onCancelOrder,*/ onUpdateStatus }) => {
       const formattedOrderId = String(order.orderId).padStart(4, '0');
       const formattedTotalPrice = new Intl.NumberFormat().format(order.totalPrice);
 
@@ -13,11 +14,11 @@ const OrderItem = ({ order, onCancelOrder, onUpdateStatus }) => {
         FINISH: '배송 완료',
         CANCEL: '취소됨',
     };
-const handleDelete = async () => {
+/*const handleDelete = async () => {
         if (window.confirm('정말로 이 주문을 삭제하시겠습니까?')) {
             await onCancelOrder(order.orderId);
         }
-};
+};*/
     return (
         <TableRow>
             <TableCell>{formattedOrderId}</TableCell>
@@ -30,11 +31,12 @@ const handleDelete = async () => {
                 onUpdateStatus={onUpdateStatus}
             />
             </TableCell>
-            <TableCell>
+           {/* <TableCell>
                 <IconButton onClick={handleDelete} aria-label="delete order">
                     <DeleteIcon />
                 </IconButton>
-            </TableCell>
+            </TableCell> */}
+            <TableCell style={{ color: 'red' }}>{statusMapping[order.status]}</TableCell>
         </TableRow>
     );
 };

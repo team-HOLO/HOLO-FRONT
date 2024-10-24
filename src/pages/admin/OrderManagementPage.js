@@ -27,7 +27,7 @@ function OrderManagementPage() {
         fetchOrders();
     }, []);
 
-    // 주문 취소
+     /*주문 취소 ( 주문을 관리하는데 있어서 필요없다고 생각하여 주석처리 )
     const cancelOrder = async (orderId) => {
         try {
             await axios.delete(`${apiUrl}/api/orders/${orderId}`,{
@@ -38,7 +38,7 @@ function OrderManagementPage() {
             console.error('주문 취소에 실패했습니다:', error);
                alert('주문 상태를 확인해주세요.'); // 사용자에게 알림 표시
            }
-       };
+       }; */
 
     // 주문 상태 변경
     const updateOrderStatus = async (orderId, newStatus) => {
@@ -70,7 +70,7 @@ function OrderManagementPage() {
             <Box display="flex" justifyContent="flex-end" mb={2}>
                 <OrderList
                     orders={paginatedOrders}
-                    onCancelOrder={cancelOrder}
+                    // onCancelOrder={cancelOrder}
                     onUpdateStatus={updateOrderStatus}
                     onToggleOrder={handleToggleOrder}
                     openOrders={openOrders}
