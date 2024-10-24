@@ -8,13 +8,8 @@ function OrderManagementPage() {
     const [page, setPage] = useState(0);  // 현재 페이지 상태
     const rowsPerPage = 10;  // 페이지당 행 수를 10으로 고정
     const [openOrders, setOpenOrders] = useState({});
+    const apiUrl = process.env.REACT_APP_API_URL;
 
-    // 주문 목록 불러오기
-    useEffect(() => {
-        fetchOrders();
-    }, []);
-
-const apiUrl = process.env.REACT_APP_API_URL;
 
     const fetchOrders = async () => {
         try {
@@ -27,6 +22,11 @@ const apiUrl = process.env.REACT_APP_API_URL;
         }
     };
 
+  // 주문 목록 불러오기
+    useEffect(() => {
+        fetchOrders();
+    }, []);
+
     // 주문 취소
     const cancelOrder = async (orderId) => {
         try {
@@ -36,8 +36,9 @@ const apiUrl = process.env.REACT_APP_API_URL;
             fetchOrders();  // 취소 후 주문 목록 갱신
         } catch (error) {
             console.error('주문 취소에 실패했습니다:', error);
-        }
-    };
+               alert('주문 상태를 확인해주세요.'); // 사용자에게 알림 표시
+           }
+       };
 
     // 주문 상태 변경
     const updateOrderStatus = async (orderId, newStatus) => {

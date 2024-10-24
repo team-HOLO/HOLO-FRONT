@@ -16,7 +16,6 @@ const OrderItem = ({ order, onCancelOrder, onUpdateStatus }) => {
 const handleDelete = async () => {
         if (window.confirm('정말로 이 주문을 삭제하시겠습니까?')) {
             await onCancelOrder(order.orderId);
-            alert('주문이 삭제되었습니다.');
         }
 };
     return (

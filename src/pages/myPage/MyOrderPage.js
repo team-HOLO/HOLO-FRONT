@@ -41,11 +41,11 @@ const MyOrderPage = () => {
 
     const handleCancelOrder = async (orderId) => {
         try {
-            await axios.delete(`${apiUrl}/api/orders/${orderId}`, {
+            await axios.put(`${apiUrl}/api/orders/${orderId}/cancel`, {
                 withCredentials: true
             });
             alert('주문이 취소되었습니다.');
-            /*fetchOrders();*/
+            fetchOrders();
             // 주문 목록을 새로고침하거나 상태를 업데이트합니다.
         } catch (error) {
             alert('주문 취소에 실패했습니다.');
